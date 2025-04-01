@@ -5,7 +5,6 @@ output$download_boxplot_norm <- downloadHandler(
     paste("normalized_boxplot_", Sys.Date(), ".png", sep = "")
   },
   content = function(file) {
-    png(file, width = 1200, height = 800, res = 150)
     
     tryCatch({
       raw_data <- as.data.frame(raw_counts())
@@ -45,6 +44,7 @@ output$download_boxplot_norm <- downloadHandler(
           legend.position = "bottom"
         )
       
+      ggsave(file, plot = p, width = 12, height = 8, dpi = 300, bg = "white")
       
     }, error = function(e) {
       showNotification(paste("Error generating boxplot:", e$message), type = "error")
