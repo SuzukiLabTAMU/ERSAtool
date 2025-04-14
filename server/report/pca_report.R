@@ -1,61 +1,60 @@
-#### PCA PLOT ####
+#### PCA PLOT (REPORT VERSION) ####
 
-pca_report <- function(raw_data, meta_data){
+pca_report <- function(raw_data, meta_data, design_columns) {
   
   tryCatch({
     raw_data <- as.data.frame(raw_data)
     meta_data <- as.data.frame(meta_data)
     
-    
-    # Detect all condition columns dynamically
-    condition_cols <- grep("^Condition(_[0-9]+)?$", colnames(meta_data), value = TRUE)
-    
-    if (length(condition_cols) == 0) {
-      stop("Metadata is missing 'Condition' columns. Please check your file.")
+    # Validate design columns
+    if (length(design_columns) == 0 || !all(design_columns %in% colnames(meta_data))) {
+      stop("Please provide valid design column(s) for PCA grouping.")
     }
     
-    # Create a combined condition column
-    meta_data$Combined_Condition <- apply(meta_data[, condition_cols, drop = FALSE], 1, paste, collapse = "_")
-    
-    # Convert to factor
+    # Create Combined_Condition
+    meta_data$Combined_Condition <- apply(meta_data[, design_columns, drop = FALSE], 1, paste, collapse = "_")
     meta_data$Combined_Condition <- as.factor(meta_data$Combined_Condition)
     
-    # Ensure raw counts and metadata sample names match
+    # Check sample name match
     if (!all(colnames(raw_data) %in% rownames(meta_data))) {
       stop("Column names of raw counts and row names of metadata do not match!")
     }
     
-    # Create DESeq2 dataset using Combined_Condition
+    # Create DESeq2 object
     dds <- DESeqDataSetFromMatrix(
       countData = round(as.matrix(raw_data)),
       colData = meta_data,
       design = ~ Combined_Condition
     )
     
-    # Filter out low-expressed genes
     dds <- dds[rowSums(counts(dds)) > 10, ]
-    
-    # Perform DESeq2 normalization
     dds <- estimateSizeFactors(dds)
     rlog_data <- rlog(dds, blind = TRUE)
     
-    # Perform PCA analysis
+    # PCA
     pc <- prcomp(t(assay(rlog_data)))
     pc_data <- as.data.frame(pc$x[, 1:2])
     colnames(pc_data) <- c("PC1", "PC2")
+    pc_data$Sample <- rownames(pc_data)
     
-    # Assign the new combined condition column
-    pc_data$Condition <- meta_data$Combined_Condition
+    # Merge PCA + metadata
+    merged_df <- merge(pc_data, meta_data, by.x = "Sample", by.y = "row.names", all.x = TRUE)
+    merged_df$Condition <- merged_df$Combined_Condition
     
-    unique_groups <- unique(pc_data$Condition)
+    unique_groups <- unique(merged_df$Condition)
     num_groups <- length(unique_groups)
     color_palette <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(8, "Dark2"))(num_groups)
     
-    ggplot(pc_data, aes(x = PC1, y = PC2, color = Condition)) +
+    ggplot(merged_df, aes(x = PC1, y = PC2, color = Condition)) +
       geom_point(size = 5) +
       scale_color_manual(values = color_palette) +
       labs(title = "PCA Plot (Grouped by Combined Condition)", x = "PC1", y = "PC2") +
-      theme_minimal()
+      theme_minimal(base_size = 14) +
+      theme(
+        plot.title = element_text(size = 18, face = "bold", hjust = 0.5),
+        legend.title = element_text(size = 13),
+        legend.text = element_text(size = 12)
+      )
     
   }, error = function(e) {
     stop("Error generating PCA plot: ", e$message)

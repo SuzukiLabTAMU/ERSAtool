@@ -1,16 +1,17 @@
 ## PCA PLOT ####
 
 output$pca_plot <- renderPlot({
-  req(raw_counts(), metadata(), dds_data())
+  req(raw_counts(), metadata(), dds_data(), input$design_columns)
   
   tryCatch({
-    meta_data <- metadata()
-    raw_data <- raw_counts()
+    meta_data <- as.data.frame(metadata())
+    raw_data <- as.data.frame(raw_counts())
     
-    condition_cols <- grep("^Condition(_[0-9]+)?$", colnames(meta_data), value = TRUE)
+    # Use selected design columns to create Combined_Condition
+    condition_cols <- input$design_columns
     
     if (length(condition_cols) == 0) {
-      stop("Metadata is missing 'Condition' columns. Please check your file.")
+      stop("Please select at least one column for PCA grouping.")
     }
     
     meta_data$Combined_Condition <- apply(meta_data[, condition_cols, drop = FALSE], 1, paste, collapse = "_")
@@ -25,10 +26,9 @@ output$pca_plot <- renderPlot({
     pc <- prcomp(t(assay(rlog_data)))
     pc_data <- as.data.frame(pc$x[, 1:2])
     colnames(pc_data) <- c("PC1", "PC2")
-    
     pc_data$Sample <- rownames(pc_data)
-    merged_df <- merge(pc_data, meta_data, by.x = "Sample", by.y = "row.names", all.x = TRUE)
     
+    merged_df <- merge(pc_data, meta_data, by.x = "Sample", by.y = "row.names", all.x = TRUE)
     merged_df$Condition <- merged_df$Combined_Condition
     
     unique_groups <- unique(merged_df$Condition)

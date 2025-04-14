@@ -5,6 +5,7 @@ output$download_pca_plot <- downloadHandler(
     paste("PCA_plot_", Sys.Date(), ".png", sep = "")
   },
   content = function(file) {
+    png(file, width = 1200, height = 800, res = 150)
     
     tryCatch({
       meta_data <- metadata()
@@ -39,8 +40,6 @@ output$download_pca_plot <- downloadHandler(
         scale_color_manual(values = color_palette) +
         labs(title = "PCA Plot (Grouped by Combined Condition)", x = "PC1", y = "PC2") +
         theme_minimal()
-      
-      ggsave(file, plot = p, width = 12, height = 8, dpi = 300, bg = "white")
       
     }, error = function(e) {
       showNotification(paste("Error in PCA Plot:", e$message), type = "error")

@@ -46,6 +46,15 @@ tabItem(tabName = "metadata",
               verbatimTextOutput("metadata_status")
           ),
           
+          box(title = "Design Formula for DESeq2", width = 12, solidHeader = TRUE, status = "info",
+              style = "border-radius: 10px; box-shadow: 2px 2px 10px rgba(0,0,0,0.1); padding: 20px;",
+              
+              div(
+                selectizeInput("design_columns","Select column(s) for DESeq2 design formula:",choices = NULL, multiple = TRUE, width = "100%"),
+                helpText("These columns will be used to build the DESeq2 design formula, e.g., ~ Condition1 + Condition2")
+              )
+          ),
+          
           box(title = "Preview Metadata Table", width = 12, solidHeader = TRUE, status = "primary",
               style = "border-radius: 10px; box-shadow: 2px 2px 10px rgba(0,0,0,0.1); padding: 15px;",
               
@@ -56,6 +65,7 @@ tabItem(tabName = "metadata",
               tags$br(),
               downloadButton("download_metadata", "Download Metadata", class = "btn-primary btn-lg")
           ),
+          
           
           box(title = "Modify Metadata Table", width = 12, solidHeader = TRUE, status = "primary",
               style = "border-radius: 10px; box-shadow: 2px 2px 10px rgba(0,0,0,0.1); padding: 20px;",

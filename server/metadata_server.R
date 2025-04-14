@@ -11,6 +11,8 @@ observeEvent(input$load_geo, {
   tryCatch({
     geo <- getGEO(input$geo_id, GSEMatrix = TRUE)
     metadata(pData(geo[[1]]))
+    colnames(meta_data) <- make.names(colnames(meta_data))
+    metadata(meta_data)
     output$metadata_status <- renderText("GEO Metadata loaded successfully!")
   }, error = function(e) {
     metadata(NULL)
@@ -36,19 +38,15 @@ observeEvent(input$upload_metadata, {
       stop("Metadata file is empty or incorrectly formatted.")
     }
     
-    required_columns <- c("Condition")  
-    missing_cols <- setdiff(required_columns, colnames(meta_data))
-    
-    if (length(missing_cols) > 0) {
-      warning_msg <- paste("Warning: Missing required columns:", paste(missing_cols, collapse = ", "))
-      showNotification(warning_msg, type = "warning")
+    if (ncol(meta_data) < 1) {
+      showNotification("Metadata has no usable columns.", type = "error")
     }
     
     if (!is.null(meta_data[[1]])) {
       rownames(meta_data) <- as.character(meta_data[[1]])
       meta_data <- meta_data[, -1, drop = FALSE]  
     }
-    
+    colnames(meta_data) <- make.names(colnames(meta_data))
     metadata(meta_data)
     output$metadata_status <- renderText("Metadata uploaded successfully!")
     
@@ -69,13 +67,7 @@ observe({
   
   updateSelectInput(session, "delete_column", choices = meta_cols)
   updateSelectInput(session, "rename_column", choices = meta_cols)
-  
-  required_columns <- c("Condition")
-  missing_cols <- setdiff(required_columns, meta_cols)
-  
-  if (length(missing_cols) > 0) {
-    showNotification(paste("Warning: Metadata is missing columns:", paste(missing_cols, collapse = ", ")), type = "warning")
-  }
+  updateSelectInput(session, "design_columns", choices = meta_cols)
 })
 
 observeEvent(input$add_column, {

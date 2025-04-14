@@ -45,19 +45,19 @@ render_report <- function(tempReport, file, input, metadata, raw_counts, reactiv
         go_term_count = input$go_term_count,
         
         # Plots and Interpretation
-        box_plot = pre_norm_box_report(raw_data, meta_data),
+        box_plot = pre_norm_box_report(raw_data, meta_data, make.names(input$design_columns)),
         boxplot_text = input$boxplot_text,
         
-        box_plot_norm = norm_box_report(raw_data, meta_data),
+        box_plot_norm = norm_box_report(raw_data, meta_data, make.names(input$design_columns)),
         boxplot_text_norm = input$boxplot_text_norm,
         
-        pca_plot = pca_report(raw_data, meta_data),
+        pca_plot = pca_report(raw_data, meta_data, make.names(input$design_columns)),
         pcaplot_text = input$pcaplot_text,
         
-        heatmap_plot = heatmap_report(raw_data, meta_data),
+        heatmap_plot = heatmap_report(raw_data, meta_data, make.names(input$design_columns)),
         heatmapplot_text = input$heatmapplot_text,
         
-        volcano_plot = volcano_report(raw_data, meta_data, input$comparison_selector,input$logfc_cutoff, input$adjp_cutoff, input$species),
+        volcano_plot = volcano_report(raw_data, meta_data, input$contrast_column, input$level1, input$level2, input$logfc_cutoff, input$adjp_cutoff, input$species, make.names(input$design_columns)),
         volcanoplot_text = input$volcanoplot_text,
         
         # GO (you said to skip — you can plug in later if added)

@@ -1,55 +1,54 @@
-#### PRE-NORMALIZED BOX PLOT ####
+#### PRE-NORMALIZED BOX PLOT (REPORT VERSION) ####
 
-pre_norm_box_report <- function(raw_data, meta_data){
+pre_norm_box_report <- function(raw_data, meta_data, design_columns) {
   
   tryCatch({
     raw_data <- as.data.frame(raw_data)
     meta_data <- as.data.frame(meta_data)
     
-    # Detect all condition columns dynamically
-    condition_cols <- grep("^Condition(_[0-9]+)?$", colnames(meta_data), value = TRUE)
-    
-    if (length(condition_cols) == 0) {
-      stop("Metadata is missing 'Condition' columns. Please check your file.")
+    # Use design columns passed in (like input$design_columns)
+    if (length(design_columns) == 0 || !all(design_columns %in% colnames(meta_data))) {
+      stop("Please provide valid design column(s) for grouping.")
     }
     
-    # Create a combined condition column
-    meta_data$Combined_Condition <- apply(meta_data[, condition_cols, drop = FALSE], 1, paste, collapse = "_")
+    # Create Combined_Condition
+    meta_data$Combined_Condition <- apply(meta_data[, design_columns, drop = FALSE], 1, paste, collapse = "_")
     
-    # Ensure raw counts and metadata sample names match
+    # Match sample names
     if (!all(colnames(raw_data) %in% rownames(meta_data))) {
       stop("Column names of raw counts and row names of metadata do not match!")
     }
     
-    # Reshape raw count data
+    # Reshape + log transform
     df <- reshape2::melt(raw_data, variable.name = "Sample", value.name = "Raw_Counts")
-    
-    # Log2 transformation
     df$Log2_Transformed_Counts <- log2(df$Raw_Counts + 1)
     
-    # Merge with metadata
     merged_df <- merge(df, meta_data, by.x = "Sample", by.y = "row.names", all.x = TRUE)
-    
-    # Assign the new combined condition column
     merged_df$Condition <- merged_df$Combined_Condition
     
     unique_groups <- unique(merged_df$Condition)
     num_groups <- length(unique_groups)
     color_palette <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(8, "Dark2"))(num_groups)
     
-    ggplot(merged_df, aes(x = Sample, y = Log2_Transformed_Counts, fill = Condition)) +
+    # Grouped by Condition (like your example screenshot)
+    ggplot(merged_df, aes(x = Condition, y = Log2_Transformed_Counts, fill = Condition)) +
       geom_boxplot(outlier.color = "red", outlier.shape = 16, outlier.size = 2) +
       scale_fill_manual(values = color_palette) +
-      xlab("Samples") +
-      ylab("log2(Raw_Counts + 1)") + 
-      ggtitle("Log2 Transformed Counts Across Samples (Grouped by Combined Condition)") +
-      theme_minimal() +
+      xlab("Combined Condition") +
+      ylab("log2(Raw_Counts + 1)") +
+      ggtitle("Box-and-Whisker Plot\nLog2 Transformed Counts by Group") +
+      theme_minimal(base_size = 14) +
       theme(
+        plot.title = element_text(size = 20, face = "bold", hjust = 0.5),
         axis.text.x = element_text(angle = 45, hjust = 1),
-        legend.position = "bottom"
+        axis.text.y = element_text(size = 13),
+        axis.title = element_text(size = 14),
+        legend.position = "none"
       )
     
   }, error = function(e) {
     showNotification(paste("Error generating boxplot:", e$message), type = "error")
+    plot.new()
+    text(0.5, 0.5, paste("Error:", e$message), cex = 1.2)
   })
 }

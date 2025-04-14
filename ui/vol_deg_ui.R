@@ -4,8 +4,9 @@ tabItem(tabName = "deg",
         fluidRow(
           
           box(title = "Volcano Plot", width = 6, solidHeader = TRUE, status = "danger",
-              selectInput("condition_1", "Select Condition 1:", choices = NULL),
-              selectInput("condition_2", "Select Condition 2:", choices = NULL),
+              selectInput("contrast_column", "Contrast Column:", choices = NULL),
+              uiOutput("contrast_level1"),
+              uiOutput("contrast_level2"),
               actionButton("generate_volcano", "Generate Volcano Plot", class = "btn-danger btn-sm"),
               tags$hr(),
               sliderInput("logfc_cutoff", "Log2 Fold Change Cutoff:", min = 0, max = 3, value = 1, step = 0.1),

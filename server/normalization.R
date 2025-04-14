@@ -2,24 +2,27 @@
 
 dds_data <- reactiveVal(NULL)
 
-observeEvent(list(raw_counts(), metadata()), {
-  req(raw_counts(), metadata())
+observeEvent(list(raw_counts(), metadata(), input$design_columns), {
+  req(raw_counts(), metadata(), input$design_columns)
   
   tryCatch({
     meta_data <- metadata()
+    colnames(meta_data) <- make.names(colnames(meta_data))
+    selected_cols <- make.names(input$design_columns)
     
-    condition_cols <- grep("^Condition(_[0-9]+)?$", colnames(meta_data), value = TRUE)
-    
-    if (length(condition_cols) == 0) {
-      showNotification("No condition columns found in metadata!", type = "error")
-      stop("No condition columns detected in metadata.")
+    if (is.null(selected_cols) || length(selected_cols) == 0) {
+      showNotification("Please select at least one column for the design formula!", type = "error")
+      stop("No design columns selected.")
     }
     
-    for (col in condition_cols) {
-      meta_data[[col]] <- as.factor(meta_data[[col]])
+    for (col in selected_cols) {
+      if (!is.factor(meta_data[[col]])) {
+        meta_data[[col]] <- as.factor(meta_data[[col]])
+      }
     }
+
+    design_formula <- as.formula(paste("~", paste(selected_cols, collapse = " + ")))
     
-    design_formula <- as.formula("~ Combined_Condition")
     count_matrix <- as.matrix(raw_counts())
     
     if (any(is.na(count_matrix))) {
@@ -33,6 +36,7 @@ observeEvent(list(raw_counts(), metadata()), {
     )
     
     dds <- dds[rowSums(counts(dds)) > 10, ]
+     
     dds <- DESeq(dds)  
     dds_data(dds)  
     

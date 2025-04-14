@@ -1,44 +1,69 @@
-## NORMALIZED BOX & WHISKER PLOT ####
+#### NORMALIZED BOX PLOT (REPORT VERSION) ####
 
-output$box_plot_norm <- renderPlot({
-  req(dds_data(), metadata())
+norm_box_report <- function(raw_data, meta_data, design_columns) {
   
   tryCatch({
-    dds <- dds_data()
+    raw_data <- as.data.frame(raw_data)
+    meta_data <- as.data.frame(meta_data)
+    
+    # Validate design columns
+    if (length(design_columns) == 0 || !all(design_columns %in% colnames(meta_data))) {
+      stop("Please provide valid design column(s) for grouping.")
+    }
+    
+    # Create combined condition column
+    meta_data$Combined_Condition <- apply(meta_data[, design_columns, drop = FALSE], 1, paste, collapse = "_")
+    meta_data$Combined_Condition <- as.factor(meta_data$Combined_Condition)
+    meta_data$Label <- meta_data$Combined_Condition  # for x-axis
+    
+    # Check sample name consistency
+    if (!all(colnames(raw_data) %in% rownames(meta_data))) {
+      stop("Column names of raw counts and row names of metadata do not match!")
+    }
+    
+    # Create DESeq2 object
+    dds <- DESeqDataSetFromMatrix(
+      countData = round(as.matrix(raw_data)),
+      colData = meta_data,
+      design = ~ Combined_Condition
+    )
+    
+    dds <- dds[rowSums(counts(dds)) > 10, ]
+    dds <- estimateSizeFactors(dds)
     norm_counts <- counts(dds, normalized = TRUE)
     pseudoCount <- log2(norm_counts + 1)
     
-    meta_data <- metadata()
+    # Melt normalized count matrix
+    df <- reshape2::melt(pseudoCount, varnames = c("Gene", "Sample"), value.name = "Log2_Norm_Counts")
     
-    condition_cols <- grep("^Condition(_[0-9]+)?$", colnames(meta_data), value = TRUE)
-    
-    if (length(condition_cols) == 0) {
-      stop("Metadata is missing 'Condition' columns. Please check your file.")
-    }
-    
-    meta_data$Combined_Condition <- apply(meta_data[, condition_cols, drop = FALSE], 1, paste, collapse = "_")
-    
-    df <- reshape2::melt(pseudoCount)
-    merged_df <- merge(df, meta_data, by.x = "Var2", by.y = "row.names", all.x = TRUE)
+    # Merge metadata
+    merged_df <- merge(df, meta_data, by.x = "Sample", by.y = "row.names", all.x = TRUE)
     merged_df$Condition <- merged_df$Combined_Condition
+    merged_df$Label <- merged_df$Combined_Condition
     
     unique_groups <- unique(merged_df$Condition)
     num_groups <- length(unique_groups)
     color_palette <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(8, "Dark2"))(num_groups)
     
-    ggplot(merged_df, aes(x = Var2, y = value, fill = Condition)) +
+    ggplot(merged_df, aes(x = Label, y = Log2_Norm_Counts, fill = Condition)) +
       geom_boxplot(outlier.color = "red", outlier.shape = 16, outlier.size = 2) +
       scale_fill_manual(values = color_palette) +
-      xlab("Samples") +
+      guides(fill = guide_legend(override.aes = list(shape = 22, size = 5))) +
+      xlab("Combined Condition") +
       ylab(expression(log[2](Normalized~Counts~+~1))) +
-      ggtitle("Normalized Counts Across Samples (Grouped by Combined Condition)") +
-      theme_minimal() +
+      ggtitle("Normalized Box-and-Whisker Plot\nNormalized Counts Across Groups") +
+      theme_minimal(base_size = 14) +
       theme(
-        axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.title = element_text(size = 20, face = "bold", hjust = 0.5),
+        axis.text.x = element_text(angle = 45, hjust = 1, size = 11),
+        axis.text.y = element_text(size = 13),
+        axis.title = element_text(size = 14),
         legend.position = "bottom"
       )
     
   }, error = function(e) {
-    showNotification(paste("Error generating boxplot:", e$message), type = "error")
+    showNotification(paste("Error generating normalized boxplot:", e$message), type = "error")
+    plot.new()
+    text(0.5, 0.5, paste("Error:", e$message), cex = 1.2)
   })
-})
+}
