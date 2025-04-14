@@ -10,30 +10,37 @@ output$download_boxplot_norm <- downloadHandler(
     tryCatch({
       raw_data <- as.data.frame(raw_counts())
       meta_data <- as.data.frame(metadata())
+      design_cols <- input$design_columns
       
-      condition_cols <- grep("^Condition(_[0-9]+)?$", colnames(meta_data), value = TRUE)
-      
-      if (length(condition_cols) == 0) {
-        stop("Metadata is missing 'Condition' columns. Please check your file.")
+      # Validate selected design columns
+      if (length(design_cols) == 0 || !all(design_cols %in% colnames(meta_data))) {
+        stop("Please select valid column(s) for DESeq2 design.")
       }
       
-      meta_data$Combined_Condition <- apply(meta_data[, condition_cols, drop = FALSE], 1, paste, collapse = "_")
+      # Create Combined Condition
+      meta_data$Combined_Condition <- apply(meta_data[, design_cols, drop = FALSE], 1, paste, collapse = "_")
+      
       if (!all(colnames(raw_data) %in% rownames(meta_data))) {
         stop("Column names of raw counts and row names of metadata do not match!")
       }
       
+      # Get normalized counts
       dds <- dds_data()
       norm_counts <- counts(dds, normalized = TRUE)
       pseudoCount <- log2(norm_counts + 1)
-      df <- reshape2::melt(pseudoCount)
-      merged_df <- merge(df, meta_data, by.x = "Var2", by.y = "row.names", all.x = TRUE)
+      
+      # Melt + merge
+      df <- reshape2::melt(pseudoCount, varnames = c("Gene", "Sample"), value.name = "Log2_Norm_Counts")
+      merged_df <- merge(df, meta_data, by.x = "Sample", by.y = "row.names", all.x = TRUE)
       merged_df$Condition <- merged_df$Combined_Condition
       
+      # Colors
       unique_groups <- unique(merged_df$Condition)
       num_groups <- length(unique_groups)
       color_palette <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(8, "Dark2"))(num_groups)
       
-      p <- ggplot(merged_df, aes(x = Var2, y = value, fill = Condition)) +
+      # Plot
+      p <- ggplot(merged_df, aes(x = Sample, y = Log2_Norm_Counts, fill = Condition)) +
         geom_boxplot(outlier.color = "red", outlier.shape = 16, outlier.size = 2) +
         scale_fill_manual(values = color_palette) +
         xlab("Samples") +
@@ -45,6 +52,7 @@ output$download_boxplot_norm <- downloadHandler(
           legend.position = "bottom"
         )
       
+      print(p)
       
     }, error = function(e) {
       showNotification(paste("Error generating boxplot:", e$message), type = "error")

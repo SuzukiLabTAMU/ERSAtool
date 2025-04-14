@@ -8,22 +8,26 @@ output$download_boxplot <- downloadHandler(
     tryCatch({
       raw_data <- as.data.frame(raw_counts())
       meta_data <- as.data.frame(metadata())
+      design_cols <- input$design_columns
       
-      condition_cols <- grep("^Condition(_[0-9]+)?$", colnames(meta_data), value = TRUE)
-      
-      if (length(condition_cols) == 0) {
-        stop("Metadata is missing 'Condition' columns. Please check your file.")
+      # Validate design columns
+      if (length(design_cols) == 0 || !all(design_cols %in% colnames(meta_data))) {
+        stop("Please select valid column(s) from design formula for plotting.")
       }
       
-      meta_data$Combined_Condition <- apply(meta_data[, condition_cols, drop = FALSE], 1, paste, collapse = "_")
+      # Create Combined_Condition
+      meta_data$Combined_Condition <- apply(meta_data[, design_cols, drop = FALSE], 1, paste, collapse = "_")
       
+      # Match sample names
       if (!all(colnames(raw_data) %in% rownames(meta_data))) {
         stop("Column names of raw counts and row names of metadata do not match!")
       }
       
       df <- reshape2::melt(raw_data, variable.name = "Sample", value.name = "Raw_Counts")
       df$Log2_Transformed_Counts <- log2(df$Raw_Counts + 1)
-      merged_df <- merge(df, meta_data, by.x = "Sample", by.y = "row.names", all.x = TRUE)
+      
+      meta_data$Sample <- rownames(meta_data)
+      merged_df <- merge(df, meta_data, by.x = "Sample", by.y = "Sample", all.x = TRUE)
       merged_df$Condition <- merged_df$Combined_Condition
       
       unique_groups <- unique(merged_df$Condition)
@@ -39,9 +43,9 @@ output$download_boxplot <- downloadHandler(
         theme_minimal() +
         theme(
           axis.text.x = element_text(angle = 45, hjust = 1),
-          legend.position = "bottom"
-        ) +
-        theme(plot.background = element_rect(fill = "white", color = NA)) 
+          legend.position = "bottom",
+          plot.background = element_rect(fill = "white", color = NA)
+        )
       
       ggsave(file, plot = p, width = 12, height = 8, dpi = 300, bg = "white")
       

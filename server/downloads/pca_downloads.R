@@ -8,17 +8,18 @@ output$download_pca_plot <- downloadHandler(
     png(file, width = 1200, height = 800, res = 150)
     
     tryCatch({
-      meta_data <- metadata()
+      raw_data <- as.data.frame(raw_counts())
+      meta_data <- as.data.frame(metadata())
+      design_cols <- input$design_columns
       
-      condition_cols <- grep("^Condition(_[0-9]+)?$", colnames(meta_data), value = TRUE)
-      
-      if (length(condition_cols) == 0) {
-        stop("Metadata is missing 'Condition' columns. Please check your file.")
+      # Validate design columns
+      if (length(design_cols) == 0 || !all(design_cols %in% colnames(meta_data))) {
+        stop("Please select valid column(s) from design formula for PCA.")
       }
       
-      meta_data$Combined_Condition <- apply(meta_data[, condition_cols, drop = FALSE], 1, paste, collapse = "_")
+      meta_data$Combined_Condition <- apply(meta_data[, design_cols, drop = FALSE], 1, paste, collapse = "_")
+      meta_data$Combined_Condition <- as.factor(meta_data$Combined_Condition)
       
-      raw_data <- raw_counts()
       if (!all(colnames(raw_data) %in% rownames(meta_data))) {
         stop("Column names of raw counts and row names of metadata do not match!")
       }
@@ -29,17 +30,23 @@ output$download_pca_plot <- downloadHandler(
       pc <- prcomp(t(assay(rlog_data)))
       pc_data <- as.data.frame(pc$x[, 1:2])
       colnames(pc_data) <- c("PC1", "PC2")
+      pc_data$Sample <- rownames(pc_data)
       
-      pc_data$Condition <- meta_data$Combined_Condition
-      unique_groups <- unique(pc_data$Condition)
+      meta_data$Sample <- rownames(meta_data)
+      merged_df <- merge(pc_data, meta_data, by = "Sample", all.x = TRUE)
+      merged_df$Condition <- merged_df$Combined_Condition
+      
+      unique_groups <- unique(merged_df$Condition)
       num_groups <- length(unique_groups)
       color_palette <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(8, "Dark2"))(num_groups)
       
-      p <- ggplot(pc_data, aes(x = PC1, y = PC2, color = Condition)) +
+      p <- ggplot(merged_df, aes(x = PC1, y = PC2, color = Condition)) +
         geom_point(size = 5) +
         scale_color_manual(values = color_palette) +
         labs(title = "PCA Plot (Grouped by Combined Condition)", x = "PC1", y = "PC2") +
         theme_minimal()
+      
+      print(p)
       
     }, error = function(e) {
       showNotification(paste("Error in PCA Plot:", e$message), type = "error")
