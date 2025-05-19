@@ -4,7 +4,7 @@ tabItem(tabName = "pca_heatmap",
         fluidRow(
           
           box(title = "PCA Plot", width = 6, solidHeader = TRUE, status = "warning",
-              plotOutput("pca_plot") %>% withSpinner(color = "#ffc107"),
+              plotlyOutput("pca_plot") %>% withSpinner(color = "#ffc107"),
               downloadButton("download_pca_plot", "Download PCA Plot", class = "btn-warning btn-sm"),
               tags$hr(),
               

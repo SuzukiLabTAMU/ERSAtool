@@ -1,6 +1,6 @@
 ## PCA PLOT ####
 
-output$pca_plot <- renderPlot({
+output$pca_plot <- renderPlotly({
   req(raw_counts(), metadata(), dds_data(), input$design_columns)
   
   tryCatch({
@@ -35,11 +35,30 @@ output$pca_plot <- renderPlot({
     num_groups <- length(unique_groups)
     color_palette <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(8, "Dark2"))(num_groups)
     
-    ggplot(merged_df, aes(x = PC1, y = PC2, color = Condition)) +
+    percentVar <- pc$sdev^2 / sum(pc$sdev^2)
+    
+    p <- ggplot(merged_df, aes(
+      x = PC1, y = PC2, color = Condition,
+      text = paste0("Sample: ", Sample,
+                    "<br>Condition: ", Condition,
+                    paste0("<br>",
+                           apply(merged_df[, condition_cols, drop = FALSE], 1, function(row) {
+                             paste0("<br>", paste(condition_cols, ": ", row, collapse = ""))
+                           })
+                    )
+      ))
+    ) +
       geom_point(size = 5) +
       scale_color_manual(values = color_palette) +
-      labs(title = "PCA Plot (Grouped by Combined Condition)", x = "PC1", y = "PC2") +
+      labs(
+        title = "PCA Plot (Grouped by Combined Condition)",
+        x = paste0("PC1 (", round(percentVar[1] * 100, 1), "%)"),
+        y = paste0("PC2 (", round(percentVar[2] * 100, 1), "%)")
+      ) +
       theme_minimal()
+    
+    
+    return (ggplotly(p, tooltip = "text"))
     
   }, error = function(e) {
     showNotification(paste("Error in PCA Plot:", e$message), type = "error")
