@@ -18,7 +18,10 @@ tabItem(tabName = "gsea",
           ),
           
           box(title = "GSEA Dot Plot", width = 12, solidHeader = TRUE, status = "danger",
-              plotOutput("gsea_plot", height = "700px") %>% withSpinner(color = "#dc3545"),  
+              plotOutput("gsea_plot", height = "700px") %>% withSpinner(color = "#dc3545"),
+              selectInput("plot_format_gsea", "Select File Format:",
+                          choices = c("PDF" = "pdf", "PNG" = "png", "JPEG" = "jpeg", "TIFF" = "tiff"),
+                          selected = "png", width = "50%"),
               downloadButton("download_gsea_plot", "Download GSEA Plot", class = "btn-danger btn-sm"),
               tags$hr(),
               

@@ -5,6 +5,9 @@ tabItem(tabName = "boxplots",
           
           box(title = "Pre-Normalized Box Plot", width = 6, solidHeader = TRUE, status = "info",
               plotOutput("box_plot", height = "500px") %>% withSpinner(color = "#17a2b8"), 
+              selectInput("pre_norm_plot_format", "Select File Format:",
+                          choices = c("PDF" = "pdf", "PNG" = "png", "JPEG" = "jpeg", "TIFF" = "tiff"),
+                          selected = "png", width = "50%"),
               downloadButton("download_boxplot", "Download Box Plot", class = "btn-info btn-sm"),
               tags$hr(),
               
@@ -19,7 +22,10 @@ tabItem(tabName = "boxplots",
           ),
           
           box(title = "Normalized Box Plot", width = 6, solidHeader = TRUE, status = "primary",
-              plotOutput("box_plot_norm", height = "500px") %>% withSpinner(color = "#007bff"),  
+              plotOutput("box_plot_norm", height = "500px") %>% withSpinner(color = "#007bff"), 
+              selectInput("norm_box_plot_format", "Select File Format:",
+                          choices = c("PDF" = "pdf", "PNG" = "png", "JPEG" = "jpeg", "TIFF" = "tiff"),
+                          selected = "png", width = "50%"),
               downloadButton("download_boxplot_norm", "Download Normalized Box Plot", class = "btn-primary btn-sm"),
               tags$hr(),
               

@@ -5,6 +5,9 @@ tabItem(tabName = "pca_heatmap",
           
           box(title = "PCA Plot", width = 6, solidHeader = TRUE, status = "warning",
               plotlyOutput("pca_plot") %>% withSpinner(color = "#ffc107"),
+              selectInput("plot_format_pca", "Select File Format:",
+                          choices = c("PDF" = "pdf", "PNG" = "png", "JPEG" = "jpeg", "TIFF" = "tiff"),
+                          selected = "png", width = "50%"),
               downloadButton("download_pca_plot", "Download PCA Plot", class = "btn-warning btn-sm"),
               tags$hr(),
               
@@ -20,6 +23,9 @@ tabItem(tabName = "pca_heatmap",
           
           box(title = "Heatmap", width = 6, solidHeader = TRUE, status = "info",
               plotOutput("heatmap_plot") %>% withSpinner(color = "#17a2b8"),
+              selectInput("plot_format_heatmap", "Select File Format:",
+                          choices = c("PDF" = "pdf", "PNG" = "png", "JPEG" = "jpeg", "TIFF" = "tiff"),
+                          selected = "png", width = "50%"),
               downloadButton("download_heatmap", "Download Heatmap", class = "btn-info btn-sm"),
               tags$hr(),
               

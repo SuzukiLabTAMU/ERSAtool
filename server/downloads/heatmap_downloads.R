@@ -1,21 +1,15 @@
-### DOWNLOAD HEATMAP PLOT ####
-
 output$download_heatmap <- downloadHandler(
   filename = function() {
-    paste("heatmap_", Sys.Date(), ".png", sep = "")
+    paste0("heatmap_", Sys.Date(), ".", input$plot_format_heatmap)
   },
   content = function(file) {
-    png(file, width = 1200, height = 1000, res = 150)  
-    
     tryCatch({
       req(raw_counts(), metadata(), dds_data())
       
       raw_counts_matrix <- round(as.matrix(raw_counts()))
-      
       if (is.null(raw_counts_matrix) || nrow(raw_counts_matrix) == 0 || ncol(raw_counts_matrix) == 0) {
         stop("Raw counts matrix is empty or not provided.")
       }
-      
       if (any(raw_counts_matrix < 0)) {
         stop("Raw counts contain negative values. Please check your input file.")
       }
@@ -51,20 +45,33 @@ output$download_heatmap <- downloadHandler(
         stop(paste("Error creating heatmap:", e$message))
       })
       
-      if (is.null(heatmap_obj)) {
-        stop("Heatmap generation failed. Check input data.")
-      }
+      # Dimensions based on number of samples
+      n_samples <- ncol(raw_counts_matrix)
+      width <- max(8, n_samples * 0.5)
+      height <- max(6, n_samples * 0.5)
       
-      grid.newpage()  
-      draw(heatmap_obj)  
+      device <- switch(
+        input$plot_format_heatmap,
+        "pdf" = cairo_pdf,
+        "png" = png,
+        "jpeg" = jpeg,
+        "tiff" = tiff
+      )
+      
+      # Use appropriate graphics device
+      device(file, width = width, height = height, units = "in", res = 300)
+      grid.newpage()
+      draw(heatmap_obj)
+      dev.off()
       
     }, error = function(e) {
       showNotification(paste("Error in Heatmap:", e$message), type = "error")
       
+      device <- png
+      device(file, width = 8, height = 6, units = "in", res = 300)
       plot.new()
       text(0.5, 0.5, paste("Error:", e$message), cex = 1.5, col = "red")
+      dev.off()
     })
-    
-    dev.off()  
   }
 )

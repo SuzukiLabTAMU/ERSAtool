@@ -1,8 +1,6 @@
-#### DOWNLOAD GSEA PLOT ####
-
 output$download_gsea_plot <- downloadHandler(
   filename = function() {
-    paste("GSEA_plot_", input$comparison_selector, "_", Sys.Date(), ".png", sep = "")
+    paste0("GSEA_plot_", input$comparison_selector, "_", Sys.Date(), ".", input$plot_format_gsea)
   },
   content = function(file) {
     tryCatch({
@@ -13,20 +11,47 @@ output$download_gsea_plot <- downloadHandler(
         stop("No enriched GSEA terms found.")
       }
       
-      p <- dotplot(reactiveValues$gsea_object,
-                   showCategory = 15,
-                   split = ".sign",
-                   font.size = 7,
-                   title = paste("GSEA -", input$comparison_selector),
-                   orderBy = "x",  
-                   label_format = 100
+      # Plot
+      p <- dotplot(
+        reactiveValues$gsea_object,
+        showCategory = input$go_term_count,
+        split = ".sign",
+        font.size = 6.5,                          # smaller label font
+        title = paste("GSEA -", input$comparison_selector),
+        orderBy = "x",
+        label_format = 40                         # wrap labels at 40 characters
       ) +
-        facet_grid(~.sign)  +
+        facet_grid(~.sign) +
+        theme_pubready() +
         theme(
-          panel.spacing = unit(0.5, "cm")
-        ) 
+          panel.spacing = unit(0.5, "cm"),
+          axis.text.y = element_text(size = 9),   # readable, compact
+          plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+          strip.text = element_text(size = 11),
+          plot.margin = margin(10, 10, 10, 10)
+        )
       
-      ggsave(file, plot = p, width = 12, height = 8, dpi = 300, bg = "white")
+      # Dynamically adjust height based on number of terms
+      plot_height <- max(8, input$go_term_count * 0.5)
+      
+      device <- switch(
+        input$plot_format_gsea,
+        "pdf" = cairo_pdf,
+        "png" = png,
+        "jpeg" = jpeg,
+        "tiff" = tiff
+      )
+      
+      ggsave(
+        filename = file,
+        plot = p,
+        device = device,
+        dpi = 300,
+        width = 12,
+        height = plot_height,
+        units = "in",
+        bg = "white"
+      )
       
     }, error = function(e) {
       showNotification(paste("Error in GSEA Plot:", e$message), type = "error")

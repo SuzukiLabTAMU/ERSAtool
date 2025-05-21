@@ -76,24 +76,25 @@ output$gsea_plot <- renderPlot({
     dotplot(reactiveValues$gsea_object,
             showCategory = 15,
             split = ".sign",
-            font.size = 7,
+            font.size = 5.5,
             title = paste("GSEA -", input$comparison_selector),
             orderBy = "x",  
             label_format = 100
     ) +
-      facet_grid(~.sign) +
-      theme(
-        panel.spacing = unit(0.5, "cm"),
-        axis.text.x = element_text(size = 18, angle = 45, hjust = 1), 
-        axis.text.y = element_text(size = 18),  
-        plot.title = element_text(size = 22, face = "bold")
-      ) 
+    facet_grid(~.sign) +
+    scale_y_discrete(labels = function(x) stringr::str_wrap(x, width = 40)) +
+    theme(
+      panel.spacing = unit(1, "cm"),
+      axis.text.x = element_text(size = 18, angle = 45, hjust = 1), 
+      axis.text.y = element_text(size = 9),  
+      plot.title = element_text(size = 22, face = "bold")
+    ) 
     
   }, error = function(e) {
     showNotification(paste("Error in GSEA Plot:", e$message), type = "error")
     NULL
   })
-}, height = 700)
+}, height = reactive({ max(900, input$go_term_count * 50) }) )
 
 ### FIXED GSEA RESULTS TABLE ####
 
