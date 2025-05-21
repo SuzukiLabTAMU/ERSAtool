@@ -18,8 +18,6 @@ tabItem(tabName = "metadata",
               tags$p("⚠️ Please ensure that your metadata file follows these rules:", 
                      style = "font-weight: bold; color: #d9534f; font-size: 16px;"),
               tags$ul(
-                tags$li("Your grouping or condition column should be named 'Condition'."),
-                tags$li("If you have multiple conditions, name them as 'Condition_1', 'Condition_2', etc."),
                 tags$li("Make sure column names do not contain special characters or spaces."),
                 tags$li("Use '.csv' or '.xlsx' file formats for best compatibility.")
               )

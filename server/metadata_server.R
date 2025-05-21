@@ -10,7 +10,7 @@ observeEvent(input$load_geo, {
   output$metadata_status <- renderText("Loading GEO Metadata...")
   tryCatch({
     geo <- getGEO(input$geo_id, GSEMatrix = TRUE)
-    metadata(pData(geo[[1]]))
+    meta_data <- pData(geo[[1]])
     colnames(meta_data) <- make.names(colnames(meta_data))
     metadata(meta_data)
     output$metadata_status <- renderText("GEO Metadata loaded successfully!")

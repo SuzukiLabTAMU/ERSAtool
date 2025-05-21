@@ -10,7 +10,7 @@ tabItem(tabName = "student_info",
               
               textInput("first_name", "First Name:"),
               textInput("last_name", "Last Name:"),
-              textInput("uin", "UIN:")
+              textInput("uin", "Sudent ID:")
           )
         )
 )
