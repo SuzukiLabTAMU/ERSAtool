@@ -31,7 +31,7 @@ observeEvent(input$toggle_gsea_code, {
     eps = 0,
     verbose = TRUE
   )
-
+        
   # Generate GSEA Dot Plot
   dotplot(
     gsea_results,

@@ -7,6 +7,7 @@ observeEvent(input$go_analysis, {
   
   tryCatch({
     selected_genes <- reactiveVolcanoData$selected_genes[[input$comparison_selector]]
+    reactiveValues$comparison_label <- input$comparison_selector
     
     if (is.null(selected_genes) || nrow(selected_genes) == 0) {
       removeNotification("go_analysis_msg")
@@ -63,13 +64,15 @@ output$bp_combined_plot <- renderPlot({
       stop("No enriched BP terms found.")
     }
     
-    p1 <- dotplot(reactiveValues$go_bp_up, showCategory = input$go_term_count, title = "BP - Upregulated Genes") + theme_minimal() +
+    p1 <- dotplot(reactiveValues$go_bp_up, showCategory = input$go_term_count, 
+                  title = paste0("BP - Upregulated in ", reactiveValues$comparison_label)) + theme_minimal() +
       theme(
         axis.text.x = element_text(size = 18, angle = 45, hjust = 1), 
         axis.text.y = element_text(size = 18),  
         plot.title = element_text(size = 22, face = "bold")
       )
-    p2 <- dotplot(reactiveValues$go_bp_down, showCategory = input$go_term_count, title = "BP - Downregulated Genes") + theme_minimal() +
+    p2 <- dotplot(reactiveValues$go_bp_down, showCategory = input$go_term_count, 
+                  title = paste0("BP - Downregulated in ", reactiveValues$comparison_label)) + theme_minimal() +
       theme(
         axis.text.x = element_text(size = 18, angle = 45, hjust = 1),  
         axis.text.y = element_text(size = 18),  
@@ -92,13 +95,15 @@ output$mf_combined_plot <- renderPlot({
       stop("No enriched MF terms found.")
     }
     
-    p1 <- dotplot(reactiveValues$go_mf_up, showCategory = input$go_term_count, title = "MF - Upregulated") + theme_minimal() +
+    p1 <- dotplot(reactiveValues$go_mf_up, showCategory = input$go_term_count, 
+                  title = paste0("MF - Upregulated in ", reactiveValues$comparison_label)) + theme_minimal() +
       theme(
         axis.text.x = element_text(size = 18, angle = 45, hjust = 1), 
         axis.text.y = element_text(size = 18), 
         plot.title = element_text(size = 22, face = "bold")
       )
-    p2 <- dotplot(reactiveValues$go_mf_down, showCategory = input$go_term_count, title = "MF - Downregulated") + theme_minimal() +
+    p2 <- dotplot(reactiveValues$go_mf_down, showCategory = input$go_term_count, 
+                  title = paste0("MF - Downregulated in ", reactiveValues$comparison_label)) + theme_minimal() +
       theme(
         axis.text.x = element_text(size = 18, angle = 45, hjust = 1),  
         axis.text.y = element_text(size = 18), 

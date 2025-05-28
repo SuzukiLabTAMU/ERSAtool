@@ -35,7 +35,9 @@ observeEvent(list(raw_counts(), metadata(), input$design_columns), {
       design = design_formula
     )
     
-    dds <- dds[rowSums(counts(dds)) > 10, ]
+    num_samples <- ncol(counts(dds))
+    dds <- dds[rowSums(counts(dds)) > num_samples, ]
+    
      
     dds <- DESeq(dds)  
     dds_data(dds)  

@@ -112,6 +112,16 @@ observeEvent(input$generate_volcano, {
   # Filter for significance
   significant <- res_df %>% dplyr::filter(padj < input$adjp_cutoff, abs(log2FoldChange) > input$logfc_cutoff)
   
+  # Calculate number of genes tested
+  num_genes_tested <- nrow(res_df)
+  
+  # Calculate number of significant up- and down-regulated genes
+  num_upregulated <- sum(res_df$padj < input$adjp_cutoff & res_df$log2FoldChange > input$logfc_cutoff, na.rm = TRUE)
+  num_downregulated <- sum(res_df$padj < input$adjp_cutoff & res_df$log2FoldChange < -input$logfc_cutoff, na.rm = TRUE)
+  
+  # Updated plot title with number of genes tested
+  plot_title <- paste0(comparison_label, " (", num_genes_tested, " Genes Tested)")
+  
   volcano_plot <- EnhancedVolcano(
     res_df,
     lab = res_df$Symbol,
@@ -119,9 +129,20 @@ observeEvent(input$generate_volcano, {
     y = 'padj',
     pCutoff = input$adjp_cutoff,
     FCcutoff = input$logfc_cutoff,
-    title = comparison_label,
+    title = plot_title,
     legendPosition = "right"
   )
+  
+  # Add annotations
+  volcano_plot <- volcano_plot +
+    annotate("text", x = max(res_df$log2FoldChange, na.rm=TRUE), 
+             y = max(-log10(res_df$padj), na.rm=TRUE), 
+             label = paste("Upregulated:\n", num_upregulated),
+             hjust = 1.1, vjust = 1.1) +
+    annotate("text", x = min(res_df$log2FoldChange, na.rm=TRUE), 
+             y = max(-log10(res_df$padj), na.rm=TRUE), 
+             label = paste("Downregulated:\n", num_downregulated),
+             hjust = -0.1, vjust = 1.1)
   
   reactiveVolcanoData$plots <- list()
   reactiveVolcanoData$plots[[comparison_label]] <- volcano_plot
