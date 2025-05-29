@@ -30,7 +30,7 @@ observeEvent(list(raw_counts(), metadata(), input$design_columns), {
     }
     
     dds <- DESeqDataSetFromMatrix(
-      countData = round(count_matrix),
+      countData = count_matrix,
       colData = meta_data,
       design = design_formula
     )

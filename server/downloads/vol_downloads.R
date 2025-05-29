@@ -11,9 +11,6 @@ output$download_volcano <- downloadHandler(
       # Get the full results from reactive (used to build original plot)
       res_df <- reactiveVolcanoData$plots[[comparison_label]]$data  # Just for continuity
       
-      # If you can't extract res_df this way, fallback:
-      # res_df <- ... (manually re-run the same DESeq results and mapping logic here)
-      
       if (is.null(res_df)) {
         stop("No data found for selected comparison.")
       }
@@ -26,8 +23,10 @@ output$download_volcano <- downloadHandler(
         y = "padj",
         pCutoff = input$adjp_cutoff,
         FCcutoff = input$logfc_cutoff,
-        title = comparison_label,
-        caption = NULL,                # ✅ Remove "total = N variables"
+        title = paste0(comparison_label, " (", nrow(res_df), " Genes Tested)"),
+        caption = paste0("Upregulated: ", sum(res_df$log2FoldChange > input$logfc_cutoff & res_df$padj < input$adjp_cutoff, na.rm = TRUE),
+                         " | Downregulated: ", sum(res_df$log2FoldChange < -input$logfc_cutoff & res_df$padj < input$adjp_cutoff, na.rm = TRUE)),
+        # ✅ Remove "total = N variables"
         legendPosition = "bottom",     # ✅ Move legend to bottom
         labSize = 3,                   # ✅ Smaller gene label font
         legendLabSize = 10             # ✅ Smaller legend font

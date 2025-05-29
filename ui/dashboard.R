@@ -14,11 +14,11 @@ dashboardPage(
   # HEADER ----
   dashboardHeader(title = tagList(
     tags$img(
-      src = "Suzukilab_logo_cropped.png",
+      src = "ERSA.png",
       height = "82px",
       style = "margin-right: 10px; image-rendering: crisp-edges; display: block;"
     ),
-    "RNA Analysis Pipeline"
+    HTML("Educational<br>RNA-Seq Analysis Tool") 
   )),
   
   # SIDEBAR ----

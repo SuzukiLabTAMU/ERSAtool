@@ -121,6 +121,7 @@ observeEvent(input$generate_volcano, {
   
   # Updated plot title with number of genes tested
   plot_title <- paste0(comparison_label, " (", num_genes_tested, " Genes Tested)")
+  plot_subtitle <- paste0("Upregulated: ", num_upregulated, " | Downregulated: ", num_downregulated)
   
   volcano_plot <- EnhancedVolcano(
     res_df,
@@ -130,19 +131,9 @@ observeEvent(input$generate_volcano, {
     pCutoff = input$adjp_cutoff,
     FCcutoff = input$logfc_cutoff,
     title = plot_title,
+    subtitle = plot_subtitle,  # Add the subtitle here
     legendPosition = "right"
   )
-  
-  # Add annotations
-  volcano_plot <- volcano_plot +
-    annotate("text", x = max(res_df$log2FoldChange, na.rm=TRUE), 
-             y = max(-log10(res_df$padj), na.rm=TRUE), 
-             label = paste("Upregulated:\n", num_upregulated),
-             hjust = 1.1, vjust = 1.1) +
-    annotate("text", x = min(res_df$log2FoldChange, na.rm=TRUE), 
-             y = max(-log10(res_df$padj), na.rm=TRUE), 
-             label = paste("Downregulated:\n", num_downregulated),
-             hjust = -0.1, vjust = 1.1)
   
   reactiveVolcanoData$plots <- list()
   reactiveVolcanoData$plots[[comparison_label]] <- volcano_plot
