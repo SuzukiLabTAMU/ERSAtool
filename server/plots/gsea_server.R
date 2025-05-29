@@ -44,7 +44,7 @@ observeEvent(input$gsea_analysis, {
       reactiveValues$gsea_object <- gsea_results
       reactiveValues$gsea_results_df <- as.data.frame(gsea_results@result)
     } else {
-      showNotification("No enriched GSEA terms found. Try adjusting the p-value cutoff.", type = "warning")
+      showNotification("No significant term enrichment was observed.", type = "warning", duration = 10)
       reactiveValues$gsea_object <- NULL
       reactiveValues$gsea_results_df <- NULL
     }
@@ -69,8 +69,8 @@ output$gsea_plot <- renderPlot({
     }
     
     if (nrow(reactiveValues$gsea_object@result) == 0) {
-      showNotification("No enriched GSEA terms found. Try adjusting the p-value cutoff.", type = "warning")
-      stop("No GSEA terms enriched under the selected p-value cutoff.")
+      showNotification("No significant term enrichment was observed.", type = "warning", duration = 10)
+      stop()
     }
     
     dotplot(reactiveValues$gsea_object,

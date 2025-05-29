@@ -4,7 +4,7 @@ tabItem(tabName = "go_analysis",
         fluidRow(
           
           box(title = "Biological Process (BP)", width = 12, solidHeader = TRUE, status = "primary",
-              numericInput("go_term_count", label = "Number of TOP GO Terms to Display:", value = 20, min = 1, step = 1, width = "300px"),
+              numericInput("go_term_count", label = "Number of TOP GO Terms to Display:", value = 10, min = 1, step = 1, width = "300px"),
               actionButton("go_analysis", "Perform GO Analysis", class = "btn-primary btn-sm"),
               plotOutput("bp_combined_plot", height = "1100px") %>% withSpinner(color = "#007bff"),
               selectInput("plot_format_bp", "Select File Format:",

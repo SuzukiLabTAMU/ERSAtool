@@ -13,12 +13,14 @@ dashboardPage(
   
   # HEADER ----
   dashboardHeader(title = tagList(
-    tags$img(
-      src = "ERSA.png",
-      height = "82px",
-      style = "margin-right: 10px; image-rendering: crisp-edges; display: block;"
-    ),
-    HTML("Educational<br>RNA-Seq Analysis Tool") 
+    title = div(
+      style = "width: 100%; text-align: center;",
+      tags$img(
+        src = "ERSA.png",
+        height = "82px",
+        style = "image-rendering: crisp-edges;"
+      )
+    )
   )),
   
   # SIDEBAR ----

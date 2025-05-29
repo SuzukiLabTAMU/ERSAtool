@@ -29,11 +29,6 @@ observeEvent(input$go_analysis, {
     upregulated_list <- bitr(upregulated_genes, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = selected_orgdb)
     downregulated_list <- bitr(downregulated_genes, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = selected_orgdb)
     
-    print("Upregulated List (first few rows):")
-    print(head(upregulated_list))
-    print("Downregulated List (first few rows):")
-    print(head(downregulated_list))
-    
     if (is.null(upregulated_list) || is.null(downregulated_list) || 
         nrow(upregulated_list) == 0 || nrow(downregulated_list) == 0) {
       showNotification("No mapped ENTREZ IDs found. Try a different species or gene set.", type = "error")

@@ -29,6 +29,10 @@ observeEvent(list(raw_counts(), metadata(), input$design_columns), {
       stop("Raw counts contain NA values!")
     }
     
+    if (any(count_matrix != floor(count_matrix), na.rm = TRUE)) {
+      stop("The count matrix includes non-integer values. Use raw count data for analysis.")
+    }
+    
     dds <- DESeqDataSetFromMatrix(
       countData = count_matrix,
       colData = meta_data,
