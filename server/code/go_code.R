@@ -11,26 +11,41 @@ observeEvent(input$toggle_bp_code, {
         height = "250px",
         value = "## Gene Ontology Analysis - Biological Processes
           
-  # Extract significant genes with adjusted p-value < input$adjp_cutoff
-  significant_genes <- rownames(
-    reactiveValues$deg_data %>%
-      dplyr::filter(padj < input$adjp_cutoff)
-  )
+  # Extract upregulated and downregulated gene symbols
+  upregulated_genes <- selected_genes %>%
+    filter(log2FoldChange > input$logfc_cutoff & padj < input$adjp_cutoff) %>%
+    pull(Symbol)
 
-  # Convert gene symbols to ENTREZ IDs
-  gene_list <- bitr(significant_genes, fromType = 'SYMBOL', toType = 'ENTREZID', OrgDb = org.Hs.eg.db)
+  downregulated_genes <- selected_genes %>%
+    filter(log2FoldChange < -input$logfc_cutoff & padj < input$adjp_cutoff) %>%
+    pull(Symbol)
+
+  # Map gene symbols to ENTREZ IDs
+  upregulated_list <- bitr(upregulated_genes, fromType = 'SYMBOL', toType = 'ENTREZID', OrgDb = selected_orgdb)
+  downregulated_list <- bitr(downregulated_genes, fromType = 'SYMBOL', toType = 'ENTREZID', OrgDb = selected_orgdb)
 
   # Perform GO enrichment analysis for Biological Processes
-  go_bp <- enrichGO(
-    gene = gene_list$ENTREZID,
-    OrgDb = org.Hs.eg.db,
+  go_bp_up <- enrichGO(
+    gene = upregulated_list$ENTREZID,
+    OrgDb = selected_orgdb,
     ont = 'BP',
     pAdjustMethod = 'BH',
     readable = TRUE
   )
 
-  # Generate BP Bar Plot
-  barplot(go_bp, showCategory = input$go_term_count, title = 'BP - Upregulated')"
+  go_bp_down <- enrichGO(
+    gene = downregulated_list$ENTREZID,
+    OrgDb = selected_orgdb,
+    ont = 'BP',
+    pAdjustMethod = 'BH',
+    readable = TRUE
+  )
+
+  # Generate BP Dotplots
+  p1 <- dotplot(go_bp_up, showCategory = input$go_term_count, title = paste0('BP - Upregulated in ', reactiveValues$up_group))
+  p2 <- dotplot(go_bp_down, showCategory = input$go_term_count, title = paste0('BP - Downregulated in ', reactiveValues$up_group))
+  gridExtra::grid.arrange(p1, p2, ncol = 2)"
+        
       )
     }
   })
@@ -46,26 +61,40 @@ observeEvent(input$toggle_mf_code, {
         readOnly = TRUE,
         height = "250px",
         value = "## Gene Ontology Analysis - Molecular Functions
-  # Extract significant genes with adjusted p-value < input$adjp_cutoff
-  significant_genes <- rownames(
-    reactiveValues$deg_data %>%
-      dplyr::filter(padj < input$adjp_cutoff)
-  )
+  # Extract upregulated and downregulated gene symbols
+  upregulated_genes <- selected_genes %>%
+    filter(log2FoldChange > input$logfc_cutoff & padj < input$adjp_cutoff) %>%
+    pull(Symbol)
 
-  # Convert gene symbols to ENTREZ IDs
-  gene_list <- bitr(significant_genes, fromType = 'SYMBOL', toType = 'ENTREZID', OrgDb = org.Hs.eg.db)
+  downregulated_genes <- selected_genes %>%
+    filter(log2FoldChange < -input$logfc_cutoff & padj < input$adjp_cutoff) %>%
+    pull(Symbol)
+
+  # Map gene symbols to ENTREZ IDs
+  upregulated_list <- bitr(upregulated_genes, fromType = 'SYMBOL', toType = 'ENTREZID', OrgDb = selected_orgdb)
+  downregulated_list <- bitr(downregulated_genes, fromType = 'SYMBOL', toType = 'ENTREZID', OrgDb = selected_orgdb)
 
   # Perform GO enrichment analysis for Molecular Functions
-  go_mf <- enrichGO(
-    gene = gene_list$ENTREZID,
-    OrgDb = org.Hs.eg.db,
+  go_mf_up <- enrichGO(
+    gene = upregulated_list$ENTREZID,
+    OrgDb = selected_orgdb,
     ont = 'MF',
     pAdjustMethod = 'BH',
     readable = TRUE
   )
 
-  # Generate MF Bar Plot
-  barplot(go_mf, showCategory = input$go_term_count, title = 'MF Upregulated')"
+  go_mf_down <- enrichGO(
+    gene = downregulated_list$ENTREZID,
+    OrgDb = selected_orgdb,
+    ont = 'MF',
+    pAdjustMethod = 'BH',
+    readable = TRUE
+  )
+
+  # Generate MF Dotplots
+  p1 <- dotplot(go_mf_up, showCategory = input$go_term_count, title = paste0('MF - Upregulated in ', reactiveValues$up_group))
+  p2 <- dotplot(go_mf_down, showCategory = input$go_term_count, title = paste0('MF - Downregulated in ', reactiveValues$up_group))
+  gridExtra::grid.arrange(p1, p2, ncol = 2)"
       )
     }
   })
