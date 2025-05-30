@@ -123,17 +123,35 @@ observeEvent(input$generate_volcano, {
   plot_title <- paste0(comparison_label, " (", num_genes_tested, " Genes Tested)")
   plot_subtitle <- paste0("Upregulated: ", num_upregulated, " | Downregulated: ", num_downregulated)
   
+  # Identify top 10 upregulated and top 10 downregulated genes
+  top_upregulated <- res_df %>%
+    filter(log2FoldChange > 0) %>%
+    arrange(padj, desc(log2FoldChange)) %>%
+    head(10)
+  
+  top_downregulated <- res_df %>%
+    filter(log2FoldChange < 0) %>%
+    arrange(padj, log2FoldChange) %>%
+    head(10)
+  
+  # Combine top labels
+  top_labels <- unique(c(top_upregulated$Symbol, top_downregulated$Symbol))
+  
   volcano_plot <- EnhancedVolcano(
     res_df,
-    lab = res_df$Symbol,
+    lab = ifelse(res_df$Symbol %in% top_labels, res_df$Symbol, ""),  # Show only top labels
     x = 'log2FoldChange',
     y = 'padj',
     pCutoff = input$adjp_cutoff,
     FCcutoff = input$logfc_cutoff,
     title = plot_title,
-    subtitle = plot_subtitle,  # Add the subtitle here
-    legendPosition = "right"
+    subtitle = plot_subtitle,
+    legendPosition = "right",
+    drawConnectors = TRUE,  # Enable arrows
+    widthConnectors = 1,  # Optional: adjust arrow width
+    colConnectors = "grey30"  # Optional: arrow color
   )
+  
   
   reactiveVolcanoData$plots <- list()
   reactiveVolcanoData$plots[[comparison_label]] <- volcano_plot

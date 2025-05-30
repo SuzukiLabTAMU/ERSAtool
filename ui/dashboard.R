@@ -47,6 +47,19 @@ dashboardPage(
         #selected_column .radio label {
           font-weight: normal !important;
         }
+        ul.navbar-nav.ml-auto.navbar-right {
+          display: none !important;
+        }
+        /* Or hide individual elements */
+        #help_switch, label[for='help_switch'] {
+          display: none !important;
+        }
+        #theme_switch, label[for='theme_switch'] {
+          display: none !important;
+        }
+        #controlbar-toggle {
+          display: none !important;
+        }
       "))
     ),
     

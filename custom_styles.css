@@ -15,3 +15,7 @@ h3 {
 .section-number::before {
   font-size: 16px;
 }
+
+/*ul.navbar-nav.ml-auto.navbar-right {
+#    display: none !important;
+}*/

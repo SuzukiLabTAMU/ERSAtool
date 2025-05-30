@@ -13,10 +13,10 @@ output$download_bp_combined_plot <- downloadHandler(
         stop("No enriched BP terms found.")
       }
       
-      p1 <- dotplot(reactiveValues$go_bp_up, showCategory = input$go_term_count, title = "BP - Upregulated") +
-        theme_pubready()
-      p2 <- dotplot(reactiveValues$go_bp_down, showCategory = input$go_term_count, title = "BP - Downregulated") +
-        theme_pubready()
+      p1 <- dotplot(reactiveValues$go_bp_up, showCategory = input$go_term_count, 
+                    title = paste0("BP - Upregulated in ", reactiveValues$up_group)) + theme_pubready()
+      p2 <- dotplot(reactiveValues$go_bp_down, showCategory = input$go_term_count, 
+                    title = paste0("BP - Downregulated in ", reactiveValues$up_group)) + theme_pubready()
       
       combined_plot <- gridExtra::arrangeGrob(p1, p2, ncol = 2)
       
@@ -33,7 +33,7 @@ output$download_bp_combined_plot <- downloadHandler(
         plot = combined_plot,
         device = device,
         width = 12,
-        height = 6,
+        height = 10,
         dpi = 300,
         units = "in",
         bg = "white"
@@ -59,10 +59,10 @@ output$download_mf_combined_plot <- downloadHandler(
         stop("No enriched MF terms found.")
       }
       
-      p1 <- dotplot(reactiveValues$go_mf_up, showCategory = input$go_term_count, title = "MF - Upregulated") +
-        theme_pubready()
-      p2 <- dotplot(reactiveValues$go_mf_down, showCategory = input$go_term_count, title = "MF - Downregulated") +
-        theme_pubready()
+      p1 <- dotplot(reactiveValues$go_mf_up, showCategory = input$go_term_count, 
+                    title = paste0("MF - Upregulated in ", reactiveValues$up_group)) + theme_pubready()
+      p2 <- dotplot(reactiveValues$go_mf_down, showCategory = input$go_term_count, 
+                    title = paste0("MF - Downregulated in ", reactiveValues$up_group)) + theme_pubready()
       
       combined_plot <- gridExtra::arrangeGrob(p1, p2, ncol = 2)
       

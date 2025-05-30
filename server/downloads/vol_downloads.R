@@ -15,10 +15,26 @@ output$download_volcano <- downloadHandler(
         stop("No data found for selected comparison.")
       }
       
+      # Get full data frame
+      res_df <- reactiveVolcanoData$plots[[comparison_label]]$data
+      
+      # Calculate top 10 up and down genes
+      top_upregulated <- res_df %>%
+        filter(log2FoldChange > 0) %>%
+        arrange(padj, desc(log2FoldChange)) %>%
+        head(10)
+      
+      top_downregulated <- res_df %>%
+        filter(log2FoldChange < 0) %>%
+        arrange(padj, log2FoldChange) %>%
+        head(10)
+      
+      top_labels <- unique(c(top_upregulated$Symbol, top_downregulated$Symbol))
+      
       # Regenerate EnhancedVolcano with download-specific settings
       volcano_download_plot <- EnhancedVolcano(
         res_df,
-        lab = res_df$Symbol,
+        lab = ifelse(res_df$Symbol %in% top_labels, res_df$Symbol, ""),
         x = "log2FoldChange",
         y = "padj",
         pCutoff = input$adjp_cutoff,
@@ -27,6 +43,9 @@ output$download_volcano <- downloadHandler(
         caption = paste0("Upregulated: ", sum(res_df$log2FoldChange > input$logfc_cutoff & res_df$padj < input$adjp_cutoff, na.rm = TRUE),
                          " | Downregulated: ", sum(res_df$log2FoldChange < -input$logfc_cutoff & res_df$padj < input$adjp_cutoff, na.rm = TRUE)),
         # ✅ Remove "total = N variables"
+        drawConnectors = TRUE,
+        widthConnectors = 1,
+        colConnectors = "grey30",
         legendPosition = "bottom",     # ✅ Move legend to bottom
         labSize = 3,                   # ✅ Smaller gene label font
         legendLabSize = 10             # ✅ Smaller legend font
