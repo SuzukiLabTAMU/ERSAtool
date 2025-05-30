@@ -29,7 +29,7 @@ observeEvent(input$toggle_gsea_code, {
   gsea_results <- gseGO(
     geneList = ranked_genes,
     OrgDb = selected_orgdb,
-    ont = 'BP',
+    ont = 'ALL',
     keyType = 'SYMBOL',
     minGSSize = 10,
     maxGSSize = 3000,

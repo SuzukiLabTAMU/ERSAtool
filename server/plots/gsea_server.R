@@ -28,7 +28,7 @@ observeEvent(input$gsea_analysis, {
     gsea_results <- gseGO(
       geneList = ranked_genes,
       OrgDb = selected_orgdb,
-      ont = "BP",
+      ont = "ALL",
       keyType = "SYMBOL",
       minGSSize = 10,
       maxGSSize = 3000,
@@ -71,7 +71,7 @@ output$gsea_plot <- renderPlot({
     }
     
     dotplot(reactiveValues$gsea_object,
-            showCategory = 15,
+            showCategory = 10,
             split = ".sign",
             font.size = 5.5,
             title = paste("GSEA -", input$comparison_selector),
