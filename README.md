@@ -1,4 +1,4 @@
-# 🧬 RNA-Seq Analysis Pipeline (Shiny App)
+# 🧬 Educational RNA-Seq Analysis tool (ERSAtool)
 
 An interactive, full-featured Shiny app for analyzing RNA-seq data. Built for students and researchers, this tool guides you from raw counts to beautifully visualized results — including a downloadable report.
 
@@ -6,14 +6,14 @@ An interactive, full-featured Shiny app for analyzing RNA-seq data. Built for st
 
 ## 📌 Features
 
-- Student & study info input
+- Student and study information input
 - Upload metadata (.csv/.xlsx) or fetch via GEO ID
 - Upload raw count matrix or STAR `.out.tab` files
 - Normalization with DESeq2
-- Boxplots (raw & normalized)
-- PCA and heatmap visualization
+- Boxplots to visualize raw and normalized count distribution
+- PCA and heatmap to visualize and interpret the relationships between samples based on their gene expression profiles.
 - Differential gene expression (DEG) analysis
-- GO enrichment (BP & MF)
+- GO enrichment analysis (BP & MF)
 - Gene Set Enrichment Analysis (GSEA)
 - Downloadable report with all results
 
@@ -31,8 +31,8 @@ An interactive, full-featured Shiny app for analyzing RNA-seq data. Built for st
 
 ## ▶️ How to Run
 
-1. Open RStudio
-2. Open `App.R`
+1. Open RStudio  
+2. Open `App.R`  
 3. Click **Run App**
 
 Or run manually:
@@ -82,7 +82,7 @@ To **successfully generate the final report**, users **must**:
 ✅ Fill in:
 - First Name  
 - Last Name  
-- UIN
+- Student ID
 
 ✅ Provide metadata with valid `Condition` column(s)
 
@@ -127,4 +127,3 @@ RNA_Seq_Pipeline/
 ```
 
 ---
-

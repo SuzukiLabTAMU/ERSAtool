@@ -21,16 +21,16 @@ observeEvent(input$toggle_gsea_code, {
 
   # Perform GSEA
   gsea_results <- gseGO(
-    geneList = ranked_genes,
-    OrgDb = org.Hs.eg.db,  
-    ont = 'ALL',            
-    keyType = 'SYMBOL',
-    minGSSize = 5,          
-    maxGSSize = 1000,
-    pvalueCutoff = 0.05,
-    eps = 0,
-    verbose = TRUE
-  )
+      geneList = ranked_genes,
+      OrgDb = selected_orgdb,
+      ont = 'BP',
+      keyType = 'SYMBOL',
+      minGSSize = 10,
+      maxGSSize = 3000,
+      pvalueCutoff = input$adjp_cutoff,
+      eps = 0,
+      verbose = TRUE
+    )
         
   # Generate GSEA Dot Plot
   dotplot(
