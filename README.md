@@ -48,9 +48,6 @@ shiny::runApp('App.R')
 ### 🧾 Metadata
 
 - File format: `.csv` or `.xlsx`
-- **Required column(s):**
-  - If **one condition** → use `Condition` (capital "C")
-  - If **multiple conditions** → use `Condition_1`, `Condition_2`, etc.
 - **❗Important:**
   - Column names **must not** contain **spaces or special characters**
   - Row names (sample names) must **match exactly** with column names in the raw count data
