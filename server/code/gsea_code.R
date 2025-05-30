@@ -21,7 +21,7 @@ observeEvent(input$toggle_gsea_code, {
   }
 
   # Prepare ranked gene list
-  ranked_genes <- setNames(selected_genes$log2FoldChange, toupper(selected_genes$Symbol))
+  ranked_genes <- setNames(selected_genes$log2FoldChange, selected_genes$Symbol)
   ranked_genes <- ranked_genes[!is.na(ranked_genes)]
   ranked_genes <- sort(ranked_genes, decreasing = TRUE)
 

@@ -13,13 +13,10 @@ observeEvent(input$gsea_analysis, {
       return(NULL)
     }
     
-    selected_genes <- selected_genes[abs(selected_genes$log2FoldChange) >= 0.58, ]
     selected_orgdb <- if (input$species == "org.Mm.eg.db") org.Mm.eg.db else org.Hs.eg.db
-    if (!"Symbol" %in% colnames(selected_genes)) {
-      selected_genes$Symbol <- rownames(selected_genes)
-    }
     
-    ranked_genes <- setNames(selected_genes$log2FoldChange, toupper(selected_genes$Symbol))
+    ranked_genes <- setNames(selected_genes$log2FoldChange, selected_genes$Symbol)
+    
     ranked_genes <- ranked_genes[!is.na(ranked_genes)]  
     ranked_genes <- sort(ranked_genes, decreasing = TRUE) 
     
@@ -44,7 +41,7 @@ observeEvent(input$gsea_analysis, {
       reactiveValues$gsea_object <- gsea_results
       reactiveValues$gsea_results_df <- as.data.frame(gsea_results@result)
     } else {
-      showNotification("No significant term enrichment was observed.", type = "warning", duration = 10)
+      showNotification("No significant term enrichment was observed.", type = "warning", duration = NULL)
       reactiveValues$gsea_object <- NULL
       reactiveValues$gsea_results_df <- NULL
     }
@@ -69,7 +66,7 @@ output$gsea_plot <- renderPlot({
     }
     
     if (nrow(reactiveValues$gsea_object@result) == 0) {
-      showNotification("No significant term enrichment was observed.", type = "warning", duration = 10)
+      showNotification("No significant term enrichment was observed.", type = "warning", duration = NULL)
       stop()
     }
     
@@ -94,7 +91,7 @@ output$gsea_plot <- renderPlot({
     showNotification(paste("Error in GSEA Plot:", e$message), type = "error")
     NULL
   })
-}, height = reactive({ max(900, input$go_term_count * 50) }) )
+}, height = reactive({ max(600, input$go_term_count * 50) }) )
 
 ### FIXED GSEA RESULTS TABLE ####
 
