@@ -16,7 +16,6 @@ observeEvent(input$gsea_analysis, {
     selected_orgdb <- if (input$species == "org.Mm.eg.db") org.Mm.eg.db else org.Hs.eg.db
     
     ranked_genes <- setNames(selected_genes$log2FoldChange, selected_genes$Symbol)
-    
     ranked_genes <- ranked_genes[!is.na(ranked_genes)]  
     ranked_genes <- sort(ranked_genes, decreasing = TRUE) 
     
@@ -25,6 +24,7 @@ observeEvent(input$gsea_analysis, {
       return(NULL)
     }
     
+    # Run GSEA with ont="ALL" to capture BP and MF
     gsea_results <- gseGO(
       geneList = ranked_genes,
       OrgDb = selected_orgdb,
@@ -54,45 +54,6 @@ observeEvent(input$gsea_analysis, {
   })
 })
 
-### FIXED GSEA PLOT ####
-
-output$gsea_plot <- renderPlot({
-  req(reactiveValues$gsea_object)
-  
-  tryCatch({
-    if (is.null(reactiveValues$gsea_object)) {
-      showNotification("GSEA data is missing. Try running analysis again.", type = "error")
-      stop("GSEA data is missing! Ensure you ran the analysis correctly.")
-    }
-    
-    if (nrow(reactiveValues$gsea_object@result) == 0) {
-      showNotification("No significant term enrichment was observed.", type = "warning", duration = NULL)
-      stop()
-    }
-    
-    dotplot(reactiveValues$gsea_object,
-            showCategory = 10,
-            split = ".sign",
-            font.size = 5.5,
-            title = paste("GSEA -", input$comparison_selector),
-            orderBy = "x",  
-            label_format = 100
-    ) +
-    facet_grid(~.sign) +
-    scale_y_discrete(labels = function(x) stringr::str_wrap(x, width = 40)) +
-    theme(
-      panel.spacing = unit(1, "cm"),
-      axis.text.x = element_text(size = 18, angle = 45, hjust = 1), 
-      axis.text.y = element_text(size = 9),  
-      plot.title = element_text(size = 22, face = "bold")
-    ) 
-    
-  }, error = function(e) {
-    showNotification(paste("Error in GSEA Plot:", e$message), type = "error")
-    NULL
-  })
-}, height = reactive({ max(600, input$go_term_count * 50) }) )
-
 ### FIXED GSEA RESULTS TABLE ####
 
 output$gsea_results <- renderDataTable({
@@ -101,4 +62,66 @@ output$gsea_results <- renderDataTable({
     reactiveValues$gsea_results_df,
     options = list(pageLength = 10, autoWidth = TRUE)
   )
+})
+
+### GSEA BP PLOT ####
+output$gsea_plot_bp <- renderPlot({
+  req(reactiveValues$gsea_object)
+  
+  tryCatch({
+    bp_object <- filter(reactiveValues$gsea_object, ONTOLOGY == "BP")
+    
+    if (nrow(bp_object@result) == 0) {
+      showNotification("No BP enrichment terms found.", type = "warning")
+      return(NULL)
+    }
+    
+    dotplot(bp_object,
+            showCategory = 10,
+            font.size = 5.5,
+            title = paste("GSEA - Biological Process (BP) -", input$comparison_selector),
+            label_format = 100
+    ) +
+      scale_y_discrete(labels = function(x) stringr::str_wrap(x, width = 40)) +
+      theme(
+        axis.text.x = element_text(size = 18, angle = 45, hjust = 1), 
+        axis.text.y = element_text(size = 9),  
+        plot.title = element_text(size = 22, face = "bold")
+      )
+    
+  }, error = function(e) {
+    showNotification(paste("Error in GSEA BP Plot:", e$message), type = "error")
+    NULL
+  })
+})
+
+### GSEA MF PLOT ####
+output$gsea_plot_mf <- renderPlot({
+  req(reactiveValues$gsea_object)
+  
+  tryCatch({
+    mf_object <- filter(reactiveValues$gsea_object, ONTOLOGY == "MF")
+    
+    if (nrow(mf_object@result) == 0) {
+      showNotification("No MF enrichment terms found.", type = "warning")
+      return(NULL)
+    }
+    
+    dotplot(mf_object,
+            showCategory = 10,
+            font.size = 5.5,
+            title = paste("GSEA - Molecular Function (MF) -", input$comparison_selector),
+            label_format = 100
+    ) +
+      scale_y_discrete(labels = function(x) stringr::str_wrap(x, width = 40)) +
+      theme(
+        axis.text.x = element_text(size = 18, angle = 45, hjust = 1), 
+        axis.text.y = element_text(size = 9),  
+        plot.title = element_text(size = 22, face = "bold")
+      )
+    
+  }, error = function(e) {
+    showNotification(paste("Error in GSEA MF Plot:", e$message), type = "error")
+    NULL
+  })
 })
