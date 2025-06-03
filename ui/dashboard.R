@@ -26,8 +26,8 @@ dashboardPage(
   # SIDEBAR ----
   dashboardSidebar(
     sidebarMenu(
-      menuItem("Student Info", tabName = "student_info", icon = icon("user-graduate")),
-      menuItem("Objective & Findings", tabName = "text_inputs", icon = icon("edit")),
+      menuItem("Student Information", tabName = "student_info", icon = icon("user-graduate")),
+      menuItem("Study Information", tabName = "text_inputs", icon = icon("edit")),
       menuItem("Metadata", tabName = "metadata", icon = icon("database")),
       menuItem("Raw Counts", tabName = "raw_counts", icon = icon("table")),
       menuItem("Box Plots", tabName = "boxplots", icon = icon("chart-bar")),
