@@ -8,12 +8,42 @@ observeEvent(input$metadata_option, {
 observeEvent(input$load_geo, {
   req(input$geo_id)
   output$metadata_status <- renderText("Loading GEO Metadata...")
+  
   tryCatch({
-    geo <- getGEO(input$geo_id, GSEMatrix = TRUE)
-    meta_data <- pData(geo[[1]])
-    colnames(meta_data) <- make.names(colnames(meta_data))
-    metadata(meta_data)
+    geo <- getGEO(input$geo_id, GSEMatrix = FALSE)
+    gsm_list <- GSMList(geo)
+    
+    # Process each sample
+    sample_metadata <- lapply(names(gsm_list), function(gsm_name) {
+      gsm <- gsm_list[[gsm_name]]
+      meta <- Meta(gsm)
+      
+      # Parse "key: value" characteristics into named list
+      char_vec <- meta$characteristics_ch1
+      char_pairs <- lapply(char_vec, function(x) {
+        parts <- strsplit(x, ":\\s*", perl = TRUE)[[1]]
+        if (length(parts) == 2) setNames(parts[2], parts[1]) else NULL
+      })
+      characteristics <- do.call(c, char_pairs)
+      
+      # Create one row with all data
+      data.frame(
+        sample_id = gsm_name,
+        title = meta$title,
+        source = meta$source_name_ch1,
+        as.list(characteristics),
+        stringsAsFactors = FALSE
+      )
+    })
+    
+    # Combine into a single dataframe
+    sample_metadata <- dplyr::bind_rows(sample_metadata)
+    colnames(sample_metadata) <- make.names(colnames(sample_metadata))
+    
+    metadata(sample_metadata)
+    
     output$metadata_status <- renderText("GEO Metadata loaded successfully!")
+    
   }, error = function(e) {
     metadata(NULL)
     output$metadata_status <- renderText(paste("Error loading GEO Metadata:", e$message))

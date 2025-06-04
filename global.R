@@ -1,7 +1,7 @@
 # INSTALL REQUIRED PACKAGES ####
 required_cran_packages <- c("shiny", "shinyFiles", "DT", "data.table", "bs4Dash", "shinycssloaders", 
                             "rmarkdown", "ggplot2", "ggrepel", "pheatmap", "readxl", "writexl", "RColorBrewer", 
-                            "dplyr", "kableExtra", "shinyAce", "plotly")
+                            "dplyr", "plyr", "kableExtra", "shinyAce", "plotly")
 
 required_bioc_packages <- c("GEOquery", "DESeq2", "ComplexHeatmap", "org.Hs.eg.db", "org.Mm.eg.db", 
                             "EnhancedVolcano", "clusterProfiler", "DOSE", "enrichplot", "AnnotationDbi")
