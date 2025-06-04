@@ -37,6 +37,13 @@ observeEvent(input$gsea_analysis, {
       verbose = TRUE
     )
     
+    # Add .sign column to split Activated vs Suppressed
+    if (!is.null(gsea_results@result)) {
+      gsea_df <- gsea_results@result
+      gsea_df$.sign <- ifelse(gsea_df$NES >= 0, "Activated", "Suppressed")
+      gsea_results@result <- gsea_df
+    }
+    
     if (!is.null(gsea_results) && nrow(gsea_results@result) > 0) {
       reactiveValues$gsea_object <- gsea_results
       reactiveValues$gsea_results_df <- as.data.frame(gsea_results@result)
@@ -78,10 +85,12 @@ output$gsea_plot_bp <- renderPlot({
     
     dotplot(bp_object,
             showCategory = 10,
+            split = ".sign",
             font.size = 5.5,
             title = paste("GSEA - Biological Process (BP) -", input$comparison_selector),
             label_format = 100
     ) +
+      facet_grid(~.sign) +
       scale_y_discrete(labels = function(x) stringr::str_wrap(x, width = 40)) +
       theme(
         axis.text.x = element_text(size = 18, angle = 45, hjust = 1), 
@@ -109,10 +118,12 @@ output$gsea_plot_mf <- renderPlot({
     
     dotplot(mf_object,
             showCategory = 10,
+            split = ".sign",
             font.size = 5.5,
             title = paste("GSEA - Molecular Function (MF) -", input$comparison_selector),
             label_format = 100
     ) +
+      facet_grid(~.sign) +
       scale_y_discrete(labels = function(x) stringr::str_wrap(x, width = 40)) +
       theme(
         axis.text.x = element_text(size = 18, angle = 45, hjust = 1), 
