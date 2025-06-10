@@ -108,6 +108,7 @@ observeEvent(input$generate_volcano, {
   # Remove duplicates
   res_df <- res[order(res$padj, decreasing = FALSE), ]
   res_df <- res_df[!duplicated(res_df$Symbol), ]
+  reactiveVolcanoData$all_genes[[comparison_label]] <- res_df
   
   # Filter for significance
   significant <- res_df %>% dplyr::filter(padj < input$adjp_cutoff, abs(log2FoldChange) > input$logfc_cutoff)

@@ -1,21 +1,16 @@
 ## GENE SET ENRICHMENT ANALYSIS (GSEA) ####
 
 observeEvent(input$gsea_analysis, {
-  req(reactiveVolcanoData$selected_genes, input$comparison_selector, input$species, input$adjp_cutoff)
+  req(reactiveVolcanoData$all_genes, input$comparison_selector, input$species, input$adjp_cutoff)
   
   showNotification("Running GSEA Analysis... Please wait.", type = "message", duration = NULL, id = "gsea_analysis_msg")
   
   tryCatch({
-    selected_genes <- reactiveVolcanoData$selected_genes[[input$comparison_selector]]
-    
-    if (is.null(selected_genes) || nrow(selected_genes) == 0) {
-      showNotification("No significant genes found. Adjust filters.", type = "warning")
-      return(NULL)
-    }
+    all_genes <- reactiveVolcanoData$all_genes[[input$comparison_selector]]
     
     selected_orgdb <- if (input$species == "org.Mm.eg.db") org.Mm.eg.db else org.Hs.eg.db
     
-    ranked_genes <- setNames(selected_genes$log2FoldChange, selected_genes$Symbol)
+    ranked_genes <- setNames(all_genes$log2FoldChange, all_genes$Symbol)
     ranked_genes <- ranked_genes[!is.na(ranked_genes)]  
     ranked_genes <- sort(ranked_genes, decreasing = TRUE) 
     
