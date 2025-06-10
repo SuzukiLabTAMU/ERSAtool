@@ -17,17 +17,24 @@ gsea_dot_report_bp <- function(rv, comparison_selector) {
       stop("No BP enrichment found.")
     }
     
+    # Add .sign column if missing
+    if (!".sign" %in% colnames(bp_object@result)) {
+      bp_object@result$.sign <- ifelse(bp_object@result$NES >= 0, "Activated", "Suppressed")
+    }
+    
     dotplot(bp_object,
-            showCategory = 15,
-            font.size = 7,
+            showCategory = 10,
+            split = ".sign",
+            font.size = 5.5,
             title = paste("GSEA - Biological Process (BP) -", comparison_selector),
             label_format = 100
     ) +
+      facet_grid(~.sign) +
       scale_y_discrete(labels = function(x) stringr::str_wrap(x, width = 40)) +
       theme(
-        panel.spacing = unit(0.5, "cm"),
+        panel.spacing = unit(1, "cm"),
         axis.text.x = element_text(size = 18, angle = 45, hjust = 1),
-        axis.text.y = element_text(size = 12),
+        axis.text.y = element_text(size = 9),
         plot.title = element_text(size = 22, face = "bold")
       )
     
@@ -49,17 +56,24 @@ gsea_dot_report_mf <- function(rv, comparison_selector) {
       stop("No MF enrichment found.")
     }
     
+    # Add .sign column if missing
+    if (!".sign" %in% colnames(mf_object@result)) {
+      mf_object@result$.sign <- ifelse(mf_object@result$NES >= 0, "Activated", "Suppressed")
+    }
+    
     dotplot(mf_object,
-            showCategory = 15,
-            font.size = 7,
+            showCategory = 10,
+            split = ".sign",
+            font.size = 5.5,
             title = paste("GSEA - Molecular Function (MF) -", comparison_selector),
             label_format = 100
     ) +
+      facet_grid(~.sign) +
       scale_y_discrete(labels = function(x) stringr::str_wrap(x, width = 40)) +
       theme(
-        panel.spacing = unit(0.5, "cm"),
+        panel.spacing = unit(1, "cm"),
         axis.text.x = element_text(size = 18, angle = 45, hjust = 1),
-        axis.text.y = element_text(size = 12),
+        axis.text.y = element_text(size = 9),
         plot.title = element_text(size = 22, face = "bold")
       )
     
