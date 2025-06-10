@@ -11,25 +11,23 @@ observeEvent(input$toggle_heatmap_code, {
         height = "250px",
         value = "## Heatmap Plot Logic
 
-  # Create a DESeq2 dataset and Normalize it as done in Normalized Box & Whisker Plot 
+# Perform rlog transformation for visualization
+rlog_data <- rlog(dds, blind = TRUE)
 
-  # Perform rlog transformation for visualization
-  rlog_data <- rlog(dds, blind = TRUE)
+# Compute sample distance matrix
+dist_matrix <- dist(t(assay(rlog_data)))
+mat <- as.matrix(dist_matrix)
+rownames(mat) <- colnames(mat) <- colnames(raw_counts_matrix)
 
-  # Compute sample distance matrix
-  dist_matrix <- dist(t(assay(rlog_data)))
-  mat <- as.matrix(dist_matrix)
-  rownames(mat) <- colnames(mat) <- colnames(raw_counts_matrix)
-
-  # Generate Heatmap
-  ComplexHeatmap::Heatmap(
-    mat,
-    name = 'Distance',
-    col = colorRampPalette(rev(brewer.pal(9, 'Reds')))(255),
-    column_title = 'Sample Distance Heatmap',
-    cluster_rows = TRUE,
-    cluster_columns = TRUE
-  )"
+# Generate Heatmap
+ComplexHeatmap::Heatmap(
+  mat,
+  name = 'Distance',
+  col = colorRampPalette(rev(brewer.pal(9, 'Reds')))(255),
+  column_title = 'Sample Distance Heatmap',
+  cluster_rows = TRUE,
+  cluster_columns = TRUE
+)"
       )
     }
   })

@@ -42,7 +42,6 @@ observeEvent(list(raw_counts(), metadata(), input$design_columns), {
     num_samples <- ncol(counts(dds))
     dds <- dds[rowSums(counts(dds)) > num_samples, ]
     
-     
     dds <- DESeq(dds)  
     dds_data(dds)  
     
