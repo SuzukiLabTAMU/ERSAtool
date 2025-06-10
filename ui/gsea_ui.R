@@ -28,7 +28,7 @@ tabItem(tabName = "gsea",
               downloadButton("download_gsea_plot_bp", "Download GSEA BP Plot", class = "btn-danger btn-sm"),
               tags$hr(),
               
-              actionButton("toggle_bp_gsea_code", "Show/Hide PCA Code", class = "btn-secondary btn-sm"),
+              actionButton("toggle_bp_gsea_code", "Show/Hide GSEA Dot Plot - BP Code", class = "btn-secondary btn-sm"),
               conditionalPanel(
                 condition = "input.toggle_bp_gsea_code % 2 == 1",
                 pre(tags$code(uiOutput("bp_gsea_code")))
@@ -48,7 +48,7 @@ tabItem(tabName = "gsea",
               downloadButton("download_gsea_plot_mf", "Download GSEA MF Plot", class = "btn-warning btn-sm"),
               tags$hr(),
               
-              actionButton("toggle_mf_gsea_code", "Show/Hide PCA Code", class = "btn-secondary btn-sm"),
+              actionButton("toggle_mf_gsea_code", "Show/Hide GSEA Dot Plot - MF Code", class = "btn-secondary btn-sm"),
               conditionalPanel(
                 condition = "input.toggle_mf_gsea_code % 2 == 1",
                 pre(tags$code(uiOutput("mf_gsea_code")))

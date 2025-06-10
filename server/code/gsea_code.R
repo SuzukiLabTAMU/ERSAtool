@@ -11,17 +11,10 @@ observeEvent(input$toggle_gsea_code, {
         height = "250px",
         value = "## Gene Set Enrichment Analysis (GSEA) - Dot Plot
           
-# Filter selected genes and apply fold change cutoff
-selected_genes <- reactiveVolcanoData$selected_genes[[input$comparison_selector]]
-selected_genes <- selected_genes[abs(selected_genes$log2FoldChange) >= 0.58, ]
-
-# Ensure SYMBOL column is present
-if (!'Symbol' %in% colnames(selected_genes)) {
-  selected_genes$Symbol <- rownames(selected_genes)
-}
+all_genes <- reactiveVolcanoData$all_genes[[input$comparison_selector]]
 
 # Prepare ranked gene list
-ranked_genes <- setNames(selected_genes$log2FoldChange, selected_genes$Symbol)
+ranked_genes <- setNames(all_genes$log2FoldChange, all_genes$Symbol)
 ranked_genes <- ranked_genes[!is.na(ranked_genes)]
 ranked_genes <- sort(ranked_genes, decreasing = TRUE)
 
