@@ -17,15 +17,17 @@ output$download_gsea_plot_bp <- downloadHandler(
       p <- dotplot(
         bp_object,
         showCategory = input$go_term_count,
-        font.size = 6.5,
-        title = paste("GSEA - BP -", input$comparison_selector),
-        label_format = 40
+        split = ".sign",
+        font.size = 5.5,
+        title = paste("GSEA - Biological Process (BP) -", input$comparison_selector),
+        label_format = 100
       ) +
+        facet_grid(~.sign) +
         scale_y_discrete(labels = function(x) stringr::str_wrap(x, width = 40)) +
         theme(
-          panel.spacing = unit(0.5, "cm"),
+          axis.text.x = element_text(size = 18, angle = 45, hjust = 1),
           axis.text.y = element_text(size = 9),
-          plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+          plot.title = element_text(size = 22, face = "bold"),
           strip.text = element_text(size = 11),
           plot.margin = margin(10, 10, 10, 10)
         )
@@ -56,15 +58,17 @@ output$download_gsea_plot_mf <- downloadHandler(
       p <- dotplot(
         mf_object,
         showCategory = input$go_term_count,
-        font.size = 6.5,
-        title = paste("GSEA - MF -", input$comparison_selector),
-        label_format = 40
+        split = ".sign",
+        font.size = 5.5,
+        title = paste("GSEA - Molecular Function (MF) -", input$comparison_selector),
+        label_format = 100
       ) +
+        facet_grid(~.sign) +
         scale_y_discrete(labels = function(x) stringr::str_wrap(x, width = 40)) +
         theme(
-          panel.spacing = unit(0.5, "cm"),
+          axis.text.x = element_text(size = 18, angle = 45, hjust = 1),
           axis.text.y = element_text(size = 9),
-          plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+          plot.title = element_text(size = 22, face = "bold"),
           strip.text = element_text(size = 11),
           plot.margin = margin(10, 10, 10, 10)
         )
