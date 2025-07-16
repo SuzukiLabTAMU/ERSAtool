@@ -2,7 +2,6 @@
 
 tabItem(tabName = "boxplots",
         fluidRow(
-          
           box(title = "Pre-Normalized Box Plot", width = 6, solidHeader = TRUE, status = "info",
               plotOutput("box_plot", height = "500px") %>% withSpinner(color = "#17a2b8"), 
               selectInput("pre_norm_plot_format", "Select File Format:",

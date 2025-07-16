@@ -3,6 +3,7 @@
 dds_data <- reactiveVal(NULL)
 
 observeEvent(list(raw_counts(), metadata(), input$design_columns), {
+  norm_start_time <- Sys.time()
   req(raw_counts(), metadata(), input$design_columns)
   
   tryCatch({
@@ -48,6 +49,8 @@ observeEvent(list(raw_counts(), metadata(), input$design_columns), {
     showNotification("Normalization completed successfully!", type = "message")
     
   }, error = function(e) {
-    showNotification(paste("Error in DESeq2 processing:", e$message), type = "error")
+    showNotification(paste("Error in DESeq2 processing:", e$message), type = "error", duration = NULL)
   })
+  norm_end_time <- Sys.time()
+  print(paste("Normarlization Time:", round(difftime(norm_end_time, norm_start_time, units = "secs"), 2), "seconds"))
 })

@@ -1,6 +1,7 @@
 ## GENE ONTOLOGY ANALYSIS ####
 
 observeEvent(input$go_analysis, {
+  go_analysis_start_time <- Sys.time()
   req(reactiveVolcanoData$selected_genes, input$comparison_selector, input$species, input$logfc_cutoff, input$adjp_cutoff)
   
   showNotification("Running GO Analysis... Please wait.", type = "message", duration = NULL, id = "go_analysis_msg")
@@ -52,6 +53,11 @@ observeEvent(input$go_analysis, {
   }, error = function(e) {
     showNotification(paste("Error in GO Analysis:", e$message), type = "error")
     removeNotification("go_analysis_msg")
+  }, finally = {
+    go_analysis_end_time <- Sys.time()
+    go_duration <- round(difftime(go_analysis_end_time, go_analysis_start_time, units = "secs"), 2)
+    message(paste("GO Analysis:", go_duration, "seconds"))
+    # cat(Sys.time(), "- GO Analysis Duration:", go_duration, "seconds\n", file = "plot_timings.log", append = TRUE)
   })
 })
 

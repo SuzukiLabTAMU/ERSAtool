@@ -41,7 +41,6 @@ dashboardPage(
   
   # BODY ----
   dashboardBody(
-    
     tags$head(
       tags$style(HTML("
         #selected_column .radio label {

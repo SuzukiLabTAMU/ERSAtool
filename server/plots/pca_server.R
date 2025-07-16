@@ -1,6 +1,7 @@
 ## PCA PLOT ####
 
 output$pca_plot <- renderPlotly({
+  pca_start_time <- Sys.time()
   req(raw_counts(), metadata(), dds_data(), input$design_columns)
   
   tryCatch({
@@ -62,5 +63,11 @@ output$pca_plot <- renderPlotly({
     
   }, error = function(e) {
     showNotification(paste("Error in PCA Plot:", e$message), type = "error")
+  }, finally = {
+    pca_end_time <- Sys.time()
+    duration <- round(difftime(pca_end_time, pca_start_time, units = "secs"), 2)
+    message(paste("PCA Plot:", duration, "seconds"))
   })
+  #pca_end_time <- Sys.time()
+  #print(paste("PCA :", round(difftime(pca_end_time, pca_start_time, units = "secs"), 2), "seconds"))
 })

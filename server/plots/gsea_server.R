@@ -1,6 +1,7 @@
 ## GENE SET ENRICHMENT ANALYSIS (GSEA) ####
 
 observeEvent(input$gsea_analysis, {
+  gsea_start_time <- Sys.time()
   req(reactiveVolcanoData$all_genes, input$comparison_selector, input$species, input$adjp_cutoff)
   
   showNotification("Running GSEA Analysis... Please wait.", type = "message", duration = NULL, id = "gsea_analysis_msg")
@@ -53,6 +54,11 @@ observeEvent(input$gsea_analysis, {
   }, error = function(e) {
     showNotification(paste("Error in GSEA Analysis:", e$message), type = "error")
     removeNotification("gsea_analysis_msg")
+  }, finally = {
+    gsea_end_time <- Sys.time()
+    gsea_duration <- round(difftime(gsea_end_time, gsea_start_time, units = "secs"), 2)
+    message(paste("GSEA Analysis:", gsea_duration, "seconds"))
+    # cat(Sys.time(), "- GSEA Analysis Duration:", gsea_duration, "seconds\n", file = "plot_timings.log", append = TRUE)
   })
 })
 

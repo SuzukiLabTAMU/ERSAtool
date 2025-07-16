@@ -22,6 +22,7 @@ output$contrast_level2 <- renderUI({
 })
 
 observeEvent(input$generate_volcano, {
+  volcano_start_time <- Sys.time()  # ✅ START TIME
   req(dds_data(), metadata(), input$species, input$design_columns, input$contrast_column, input$level1, input$level2)
   
   showNotification("Running Enhanced Volcano Plot... Please wait.", type = "message", duration = NULL, id = "EV_msg")
@@ -161,6 +162,9 @@ observeEvent(input$generate_volcano, {
   updateSelectInput(session, "comparison_selector", choices = names(reactiveVolcanoData$plots), selected = comparison_label)
   
   removeNotification("EV_msg")
+  volcano_end_time <- Sys.time()  # ✅ END TIME
+  volcano_duration <- round(difftime(volcano_end_time, volcano_start_time, units = "secs"), 2)
+  message(paste("Volcano Plot:", volcano_duration, "seconds"))
 })
 
 output$volcano_plot <- renderPlot({

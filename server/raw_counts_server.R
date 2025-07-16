@@ -6,6 +6,7 @@ observeEvent(input$file_type, {
 })
 
 observeEvent(input$raw_counts, {
+  raw_start_time <- Sys.time()
   req(input$file_type == "raw")
   req(input$raw_counts)
   
@@ -34,9 +35,18 @@ observeEvent(input$raw_counts, {
   }, error = function(e) {
     output$data_preview <- renderText(paste("Error processing raw count matrix:", e$message))
   })
+  raw_end_time <- Sys.time()
+  print(paste("Raw Counts:", round(difftime(raw_end_time, raw_start_time, units = "secs"), 2), "seconds"))
+  
+  cat(paste0(
+    Sys.time(), " - [CSV Upload] Duration: ",
+    round(difftime(raw_end_time, raw_start_time, units = "secs"), 2), " seconds\n"
+  ), file = "raw_upload_timings.log", append = TRUE)
+  
 })
 
 observeEvent(input$out_tab_files, {
+  rawo_start_time <- Sys.time()
   req(input$file_type == "out_tab")
   req(input$out_tab_files)
   req(input$selected_column)
@@ -82,6 +92,8 @@ observeEvent(input$out_tab_files, {
     counts_df <- counts_df[, -1]
     raw_counts(counts_df)
   }
+  rawo_end_time <- Sys.time()
+  print(paste("Raw Counts:", round(difftime(rawo_end_time, rawo_start_time, units = "secs"), 2), "seconds"))
 })
 
 output$raw_preview <- renderDataTable({
@@ -91,6 +103,5 @@ output$raw_preview <- renderDataTable({
   if (!"GeneID" %in% colnames(preview_data)) {
     preview_data <- cbind(GeneID = rownames(preview_data), preview_data)
   }
-  
   datatable(preview_data, options = list(dom = 't', autowidth = TRUE), rownames = FALSE)
 })

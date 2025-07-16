@@ -6,6 +6,7 @@ observeEvent(input$metadata_option, {
 })
 
 observeEvent(input$load_geo, {
+  metg_start_time <- Sys.time()
   req(input$geo_id)
   output$metadata_status <- renderText("Loading GEO Metadata...")
   
@@ -48,9 +49,12 @@ observeEvent(input$load_geo, {
     metadata(NULL)
     output$metadata_status <- renderText(paste("Error loading GEO Metadata:", e$message))
   })
+  metg_end_time <- Sys.time()
+  print(paste("metadata GEO:", round(difftime(metg_end_time, metg_start_time, units = "secs"), 2), "seconds"))
 })
 
 observeEvent(input$upload_metadata, {
+  met_start_time <- Sys.time()
   req(input$upload_metadata)
   file_path <- input$upload_metadata$datapath
   file_ext <- tools::file_ext(file_path)
@@ -84,6 +88,8 @@ observeEvent(input$upload_metadata, {
     metadata(NULL)
     output$metadata_status <- renderText(paste("Error loading metadata:", e$message))
   })
+  met_end_time <- Sys.time()
+  print(paste("metadata:", round(difftime(met_end_time, met_start_time, units = "secs"), 2), "seconds"))
 })
 
 output$metadata_table <- renderDT({
@@ -183,3 +189,4 @@ output$download_metadata <- downloadHandler(
     write_xlsx(meta_with_rownames, file)
   }
 )
+

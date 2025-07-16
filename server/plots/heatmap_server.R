@@ -1,6 +1,7 @@
 ## HEATMAP ####
 
 output$heatmap_plot <- renderPlot({
+  heatmap_start_time <- Sys.time()
   req(raw_counts(), metadata(), dds_data())
   tryCatch({
     raw_counts_matrix <- round(as.matrix(raw_counts()))
@@ -33,5 +34,11 @@ output$heatmap_plot <- renderPlot({
     )
   }, error = function(e) {
     showNotification(paste("Error in Heatmap:", e$message), type = "error")
+  }, finally = {
+    heatmap_end_time <- Sys.time()
+    duration <- round(difftime(heatmap_end_time, heatmap_start_time, units = "secs"), 2)
+    message(paste("Heatmap Plot:", duration, "seconds"))
+    # Optional: log to file
+    # cat(Sys.time(), "- Heatmap Plot Duration:", duration, "seconds\n", file = "plot_timings.log", append = TRUE)
   })
 })

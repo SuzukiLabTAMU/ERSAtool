@@ -1,6 +1,7 @@
 ## NORMALIZED BOX & WHISKER PLOT ####
 
 output$box_plot_norm <- renderPlot({
+  box_start_time <- Sys.time()
   req(dds_data(), metadata(), input$design_columns)
   
   tryCatch({
@@ -40,5 +41,9 @@ output$box_plot_norm <- renderPlot({
     
   }, error = function(e) {
     showNotification(paste("Error generating boxplot:", e$message), type = "error")
+  }, finally = {
+    box_end_time <- Sys.time()
+    duration <- round(difftime(box_end_time, box_start_time, units = "secs"), 2)
+    message(paste("BOX Plots:", duration, "seconds"))
   })
 })
