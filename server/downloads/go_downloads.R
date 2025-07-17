@@ -20,13 +20,7 @@ output$download_bp_combined_plot <- downloadHandler(
       
       combined_plot <- gridExtra::arrangeGrob(p1, p2, ncol = 2)
       
-      device <- switch(
-        input$plot_format_bp,
-        "pdf" = cairo_pdf,
-        "png" = png,
-        "jpeg" = jpeg,
-        "tiff" = tiff
-      )
+      device <- tolower(input$plot_format_bp)
       
       ggsave(
         filename = file,
@@ -66,13 +60,7 @@ output$download_mf_combined_plot <- downloadHandler(
       
       combined_plot <- gridExtra::arrangeGrob(p1, p2, ncol = 2)
       
-      device <- switch(
-        input$plot_format_mf,
-        "pdf" = cairo_pdf,
-        "png" = png,
-        "jpeg" = jpeg,
-        "tiff" = tiff
-      )
+      device <- tolower(input$plot_format_mf)
       
       ggsave(
         filename = file,

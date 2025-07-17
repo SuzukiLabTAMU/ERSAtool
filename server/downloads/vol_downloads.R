@@ -57,13 +57,7 @@ output$download_volcano <- downloadHandler(
       plot_width <- 8
       plot_height <- 8
       
-      device <- switch(
-        input$plot_format_volcano,
-        "pdf" = cairo_pdf,
-        "png" = png,
-        "jpeg" = jpeg,
-        "tiff" = tiff
-      )
+      device <- tolower(input$plot_format_volcano)
       
       ggsave(
         filename = file,

@@ -37,6 +37,14 @@ tabItem(tabName = "raw_counts",
               
               div(style = "overflow-x: auto; max-height: 500px;",
                   dataTableOutput("raw_preview") %>% withSpinner(color = "#28a745")
+              ),
+              
+              tags$hr(),
+              
+              actionButton("toggle_normal_code", "Show/Hide Normalization Code", class = "btn-secondary btn-sm"),
+              conditionalPanel(
+                condition = "input.toggle_normal_code % 2 == 1",
+                pre(tags$code(uiOutput("normal_code")))  
               )
           )
         )

@@ -32,46 +32,52 @@ output$download_heatmap <- downloadHandler(
       mat <- as.matrix(dist_matrix)
       rownames(mat) <- colnames(mat) <- colnames(raw_counts_matrix)
       
-      heatmap_obj <- tryCatch({
-        ComplexHeatmap::Heatmap(
-          mat,
-          name = "Distance",
-          col = colorRampPalette(rev(RColorBrewer::brewer.pal(9, "Reds")))(255),
-          column_title = "Sample Distance Heatmap",
-          cluster_rows = TRUE,
-          cluster_columns = TRUE
-        )
-      }, error = function(e) {
-        stop(paste("Error creating heatmap:", e$message))
-      })
+      heatmap_obj <- ComplexHeatmap::Heatmap(
+        mat,
+        name = "Distance",
+        col = colorRampPalette(rev(RColorBrewer::brewer.pal(9, "Reds")))(255),
+        column_title = "Sample Distance Heatmap",
+        cluster_rows = TRUE,
+        cluster_columns = TRUE
+      )
       
       # Dimensions based on number of samples
       n_samples <- ncol(raw_counts_matrix)
       width <- max(8, n_samples * 0.5)
       height <- max(6, n_samples * 0.5)
       
-      device <- switch(
-        input$plot_format_heatmap,
-        "pdf" = cairo_pdf,
-        "png" = png,
-        "jpeg" = jpeg,
-        "tiff" = tiff
-      )
+      # Capture heatmap using grid.grabExpr
+      g <- grid::grid.grabExpr(draw(heatmap_obj))
       
-      # Use appropriate graphics device
-      device(file, width = width, height = height, units = "in", res = 300)
-      grid.newpage()
-      draw(heatmap_obj)
-      dev.off()
+      # Save using ggsave
+      ggsave(
+        filename = file,
+        plot = g,
+        device = tolower(input$plot_format_heatmap),
+        dpi = 300,
+        width = width,
+        height = height,
+        units = "in",
+        bg = "white"
+      )
       
     }, error = function(e) {
       showNotification(paste("Error in Heatmap:", e$message), type = "error")
       
-      device <- png
-      device(file, width = 8, height = 6, units = "in", res = 300)
-      plot.new()
-      text(0.5, 0.5, paste("Error:", e$message), cex = 1.5, col = "red")
-      dev.off()
+      # Error fallback image
+      ggsave(
+        filename = file,
+        plot = grid::grid.grabExpr({
+          grid::grid.newpage()
+          grid::grid.text(paste("Error:", e$message), x = 0.5, y = 0.5, gp = grid::gpar(col = "red", cex = 1.5))
+        }),
+        device = "png",
+        width = 8,
+        height = 6,
+        dpi = 300,
+        units = "in",
+        bg = "white"
+      )
     })
   }
 )

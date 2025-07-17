@@ -49,13 +49,7 @@ output$download_boxplot_norm <- downloadHandler(
         ) +
         guides(fill = guide_legend(title = "Condition", title.position = "top", title.hjust = 0.5))
       
-      device <- switch(
-        input$norm_box_plot_format,
-        "pdf" = cairo_pdf,
-        "png" = png,
-        "jpeg" = jpeg,
-        "tiff" = tiff
-      )
+      device <- tolower(input$norm_box_plot_format)
       
       ggsave(
         filename = file,

@@ -27,6 +27,7 @@ server <- function(input, output, session) {
   
   # === RAW COUNTS ===
   source("server/raw_counts_server.R", local = TRUE)
+  source("server/code/normal_code.R", local = TRUE)
   
   # === BOX PLOTS - Pre-Normalized ===
   source("server/plots/pre_norm_box_server.R", local = TRUE)

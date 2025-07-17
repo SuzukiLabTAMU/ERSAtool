@@ -32,7 +32,7 @@ output$download_gsea_plot_bp <- downloadHandler(
           plot.margin = margin(10, 10, 10, 10)
         )
       
-      device <- switch(input$plot_format_gsea_bp, "pdf" = cairo_pdf, "png" = png, "jpeg" = jpeg, "tiff" = tiff)
+      device <- tolower(input$plot_format_gsea_bp)
       ggsave(file, plot = p, device = device, dpi = 300, width = 12, height = max(8, input$go_term_count * 0.5), units = "in", bg = "white")
       
     }, error = function(e) {
@@ -73,7 +73,7 @@ output$download_gsea_plot_mf <- downloadHandler(
           plot.margin = margin(10, 10, 10, 10)
         )
       
-      device <- switch(input$plot_format_gsea_mf, "pdf" = cairo_pdf, "png" = png, "jpeg" = jpeg, "tiff" = tiff)
+      device <- tolower(input$plot_format_gsea_mf)
       ggsave(file, plot = p, device = device, dpi = 300, width = 12, height = max(8, input$go_term_count * 0.5), units = "in", bg = "white")
       
     }, error = function(e) {

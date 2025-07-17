@@ -73,14 +73,14 @@ output$bp_combined_plot <- renderPlot({
     }
     
     p1 <- dotplot(reactiveValues$go_bp_up, showCategory = input$go_term_count, 
-                  title = paste0("BP - Upregulated in ", reactiveValues$up_group)) + theme_minimal() +
+                  title = paste0("BP - Activated in ", reactiveValues$up_group)) + theme_minimal() +
       theme(
         axis.text.x = element_text(size = 18, angle = 45, hjust = 1), 
         axis.text.y = element_text(size = 18),  
         plot.title = element_text(size = 22, face = "bold")
       )
     p2 <- dotplot(reactiveValues$go_bp_down, showCategory = input$go_term_count, 
-                  title = paste0("BP - Downregulated in ", reactiveValues$up_group)) + theme_minimal() +
+                  title = paste0("BP - Suppressed in ", reactiveValues$up_group)) + theme_minimal() +
       theme(
         axis.text.x = element_text(size = 18, angle = 45, hjust = 1),  
         axis.text.y = element_text(size = 18),  
@@ -104,14 +104,14 @@ output$mf_combined_plot <- renderPlot({
     }
     
     p1 <- dotplot(reactiveValues$go_mf_up, showCategory = input$go_term_count, 
-                  title = paste0("MF - Upregulated in ", reactiveValues$up_group)) + theme_minimal() +
+                  title = paste0("MF - Activated in ", reactiveValues$up_group)) + theme_minimal() +
       theme(
         axis.text.x = element_text(size = 18, angle = 45, hjust = 1), 
         axis.text.y = element_text(size = 18), 
         plot.title = element_text(size = 22, face = "bold")
       )
     p2 <- dotplot(reactiveValues$go_mf_down, showCategory = input$go_term_count, 
-                  title = paste0("MF - Downregulated in ", reactiveValues$up_group)) + theme_minimal() +
+                  title = paste0("MF - Suppressed in ", reactiveValues$up_group)) + theme_minimal() +
       theme(
         axis.text.x = element_text(size = 18, angle = 45, hjust = 1),  
         axis.text.y = element_text(size = 18), 

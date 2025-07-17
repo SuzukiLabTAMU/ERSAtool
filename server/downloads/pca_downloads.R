@@ -59,13 +59,7 @@ output$download_pca_plot <- downloadHandler(
       plot_width <- max(8, num_groups * 2)
       plot_height <- 6
       
-      device <- switch(
-        input$plot_format_pca,
-        "pdf" = cairo_pdf,
-        "png" = png,
-        "jpeg" = jpeg,
-        "tiff" = tiff
-      )
+      device <- tolower(input$plot_format_pca)
       
       ggsave(
         filename = file,
