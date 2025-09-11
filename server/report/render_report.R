@@ -72,8 +72,9 @@ render_report <- function(tempReport, file, input, metadata, raw_counts, reactiv
         # GSEA
         gsea_results = gsea_results_report(reactiveValues),
         gsea_plot_bp = gsea_dot_report_bp(reactiveValues, input$comparison_selector),
+        gseaplot_text_bp = input$gseaplot_text_bp,
         gsea_plot_mf = gsea_dot_report_mf(reactiveValues, input$comparison_selector),
-        gseaplot_text = input$gseaplot_text
+        gseaplot_text_mf = input$gseaplot_text_mf
       ),
       envir = new.env(parent = globalenv())
     )
