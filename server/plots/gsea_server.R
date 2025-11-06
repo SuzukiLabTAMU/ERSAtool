@@ -137,3 +137,20 @@ output$gsea_plot_mf <- renderPlot({
     NULL
   })
 })
+
+### 📁 (NEW) DOWNLOAD GSEA RESULTS TABLE ####
+output$download_gsea_results <- downloadHandler(
+  filename = function() {
+    paste0(
+      "GSEA_results_",
+      req(input$comparison_selector),
+      "_", format(Sys.time(), "%Y-%m-%d_%H%M%S"), ".csv"
+    )
+  },
+  content = function(file) {
+    req(reactiveValues$gsea_results_df)
+    readr::write_csv(reactiveValues$gsea_results_df, file)
+    # base alternative:
+    # write.csv(reactiveValues$gsea_results_df, file, row.names = FALSE)
+  }
+)

@@ -10,6 +10,8 @@ tabItem(tabName = "gsea",
                   dataTableOutput("gsea_results") %>% withSpinner(color = "#28a745")
               ),
               tags$hr(),
+              downloadButton("download_gsea_results", "Download CSV", class = "btn-success btn-sm"), #new
+              tags$br(),
               actionButton("toggle_gsea_code", "Show/Hide GSEA Code", class = "btn-secondary btn-sm"),
               conditionalPanel(
                 condition = "input.toggle_gsea_code % 2 == 1",
